@@ -1,0 +1,23 @@
+# Portal Automation Agent Requirements
+# Core automation and scheduling dependencies
+
+# Nova Act - Browser automation framework
+nova-act>=1.0.0
+
+# Scheduling and task management
+schedule>=1.2.0
+
+# Web dashboard (optional)
+Flask>=2.3.0
+Werkzeug>=2.3.0
+
+# Data handling and utilities
+python-dotenv>=1.0.0
+PyPDF2>=3.0.0
+
+# Logging and monitoring
+colorlog>=6.7.0
+
+# Development and testing (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0

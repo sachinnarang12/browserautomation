@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sensitive Files - DO NOT COMMIT
+.env
+*.db
+portal_agent.db
+credentials_index.json
+users.json
+agent_config.json
+*.log
+portal_agent.log
+
+# Downloaded Files
+nova_downloads/
+*.pdf
+*.xlsx
+*.xls
+usage_data_*.json
+usage_data_*.txt
+
+# Temporary Files
+temp_*.py
+*.tmp
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Nova Act Logs
+*.html
+
+# Kiro specific
+.kiro/
+
+# AWS/Deployment (legacy)
+.elasticbeanstalk/
+*.pem
+*.key

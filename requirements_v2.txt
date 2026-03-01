@@ -1,0 +1,46 @@
+# Portal Automation Agent V2.0 Requirements
+
+# Core Dependencies
+nova-act>=1.0.0
+schedule>=1.2.0
+python-dotenv>=1.0.0
+
+# Web Framework
+Flask>=3.0.0
+Werkzeug>=3.0.0
+
+# Security
+keyring>=24.0.0
+cryptography>=41.0.0
+python-jose[cryptography]>=3.3.0
+passlib>=1.7.4
+bcrypt>=4.0.1
+
+# Database
+SQLAlchemy>=2.0.0
+alembic>=1.12.0
+
+# UI Enhancement
+Flask-Login>=0.6.3
+Flask-WTF>=1.2.0
+WTForms>=3.1.0
+
+# Utilities
+click>=8.1.7
+colorama>=0.4.6
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# Monitoring & Logging
+structlog>=23.2.0
+
+# Optional: Notifications
+# requests>=2.31.0  # For webhooks
+# python-telegram-bot>=20.0  # For Telegram
+# slack-sdk>=3.23.0  # For Slack
+
+# Development
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.11.0
+flake8>=6.1.0
