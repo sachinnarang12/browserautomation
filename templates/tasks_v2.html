@@ -67,6 +67,11 @@
                                     {{ task.last_run|datetime if task.last_run else 'Never' }}
                                 </td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <button onclick="runTask('{{ task.id }}', this)"
+                                            class="text-indigo-600 hover:text-indigo-900 mr-3"
+                                            {% if task.status == 'running' %}disabled{% endif %}>
+                                        Run
+                                    </button>
                                     <a href="{{ url_for('task_details', task_id=task.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
                                     <a href="{{ url_for('edit_task', task_id=task.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
                                 </td>
@@ -97,4 +102,37 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+async function runTask(taskId, btn) {
+    const origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Starting...';
+
+    try {
+        const resp = await fetch(`/api/task/${taskId}/run`, { method: 'POST' });
+        const data = await resp.json();
+
+        if (data.success) {
+            btn.textContent = 'Running...';
+            const poll = setInterval(async () => {
+                const s = await fetch(`/api/task/${taskId}/status`);
+                const sd = await s.json();
+                if (sd.status === 'completed' || sd.status === 'failed') {
+                    clearInterval(poll);
+                    location.reload();
+                }
+            }, 3000);
+        } else {
+            alert(data.message);
+            btn.disabled = false;
+            btn.textContent = origText;
+        }
+    } catch (err) {
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = origText;
+    }
+}
+</script>
 {% endblock %}

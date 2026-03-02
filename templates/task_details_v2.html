@@ -22,6 +22,11 @@
             <h2 class="text-2xl font-bold leading-7 text-gray-900">{{ task.name }}</h2>
         </div>
         <div class="mt-4 flex md:ml-4 md:mt-0 space-x-3">
+            <button id="run-now-btn" onclick="runTaskNow('{{ task.id }}')"
+                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                    {% if task.status == 'running' %}disabled{% endif %}>
+                Run Now
+            </button>
             <a href="{{ url_for('edit_task', task_id=task.id) }}"
                class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                 Edit
@@ -101,5 +106,92 @@
             </dl>
         </div>
     </div>
+
+    <!-- Run status banner (hidden by default) -->
+    <div id="run-status" class="hidden mt-6 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0" id="run-status-icon"></div>
+            <div class="ml-3">
+                <p class="text-sm font-medium" id="run-status-text"></p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+let pollInterval = null;
+
+async function runTaskNow(taskId) {
+    const btn = document.getElementById('run-now-btn');
+    btn.disabled = true;
+    btn.textContent = 'Starting...';
+    showStatus('running', 'Starting task...');
+
+    try {
+        const resp = await fetch(`/api/task/${taskId}/run`, { method: 'POST' });
+        const data = await resp.json();
+
+        if (data.success) {
+            btn.textContent = 'Running...';
+            showStatus('running', data.message);
+            pollInterval = setInterval(() => pollStatus(taskId), 3000);
+        } else {
+            btn.disabled = false;
+            btn.textContent = 'Run Now';
+            showStatus('error', data.message);
+        }
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Run Now';
+        showStatus('error', 'Network error: ' + err.message);
+    }
+}
+
+async function pollStatus(taskId) {
+    try {
+        const resp = await fetch(`/api/task/${taskId}/status`);
+        const data = await resp.json();
+
+        if (data.status === 'completed') {
+            clearInterval(pollInterval);
+            showStatus('success', 'Task completed successfully!');
+            document.getElementById('run-now-btn').textContent = 'Run Now';
+            document.getElementById('run-now-btn').disabled = false;
+            setTimeout(() => location.reload(), 2000);
+        } else if (data.status === 'failed') {
+            clearInterval(pollInterval);
+            showStatus('error', 'Task failed: ' + (data.error_message || 'Unknown error'));
+            document.getElementById('run-now-btn').textContent = 'Run Now';
+            document.getElementById('run-now-btn').disabled = false;
+        }
+    } catch (err) {
+        // keep polling on network hiccup
+    }
+}
+
+function showStatus(type, message) {
+    const banner = document.getElementById('run-status');
+    const icon = document.getElementById('run-status-icon');
+    const text = document.getElementById('run-status-text');
+
+    banner.classList.remove('hidden', 'bg-blue-50', 'bg-green-50', 'bg-red-50');
+    text.classList.remove('text-blue-800', 'text-green-800', 'text-red-800');
+
+    if (type === 'running') {
+        banner.classList.add('bg-blue-50');
+        text.classList.add('text-blue-800');
+        icon.innerHTML = '<svg class="h-5 w-5 text-blue-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>';
+    } else if (type === 'success') {
+        banner.classList.add('bg-green-50');
+        text.classList.add('text-green-800');
+        icon.innerHTML = '<svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>';
+    } else {
+        banner.classList.add('bg-red-50');
+        text.classList.add('text-red-800');
+        icon.innerHTML = '<svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg>';
+    }
+
+    text.textContent = message;
+}
+</script>
 {% endblock %}

@@ -416,6 +416,68 @@ def change_password():
 # API Routes
 # ============================================================================
 
+@app.route('/api/task/<task_id>/run', methods=['POST'])
+@login_required
+def run_task(task_id):
+    """Execute a task immediately in a background thread"""
+    from portal_automation_agent import PortalAutomationAgent
+
+    config_file = Path('agent_config.json')
+    if not config_file.exists():
+        return jsonify({'success': False, 'message': 'No config file found'}), 404
+
+    with open(config_file, 'r') as f:
+        data = json.load(f)
+
+    task = next((t for t in data['tasks'] if t['id'] == task_id), None)
+    if not task:
+        return jsonify({'success': False, 'message': f'Task {task_id} not found'}), 404
+
+    if task.get('status') == 'running':
+        return jsonify({'success': False, 'message': 'Task is already running'}), 409
+
+    import threading
+
+    def run_in_background(tid):
+        try:
+            agent = PortalAutomationAgent()
+            agent._execute_task(tid)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Background task {tid} failed: {e}")
+
+    thread = threading.Thread(target=run_in_background, args=(task_id,), daemon=True)
+    thread.start()
+
+    return jsonify({
+        'success': True,
+        'message': f'Task "{task.get("name", task_id)}" started. Check status for progress.'
+    })
+
+@app.route('/api/task/<task_id>/status')
+@login_required
+def task_status(task_id):
+    """Get current task status (for polling)"""
+    config_file = Path('agent_config.json')
+    if not config_file.exists():
+        return jsonify({'success': False, 'message': 'No config found'}), 404
+
+    with open(config_file, 'r') as f:
+        data = json.load(f)
+
+    task = next((t for t in data['tasks'] if t['id'] == task_id), None)
+    if not task:
+        return jsonify({'success': False, 'message': 'Task not found'}), 404
+
+    return jsonify({
+        'success': True,
+        'status': task.get('status', 'unknown'),
+        'last_run': task.get('last_run'),
+        'result': task.get('result'),
+        'error_message': task.get('error_message'),
+        'retry_count': task.get('retry_count', 0)
+    })
+
 @app.route('/api/status')
 @login_required
 def api_status():
