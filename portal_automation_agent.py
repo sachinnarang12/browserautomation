@@ -72,6 +72,7 @@ class PortalAutomationAgent:
         self.nova_config = {
             "headless": False,
             "tty": False,
+            "ignore_https_errors": True,
             "nova_act_api_key": "3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
         }
         

@@ -103,6 +103,22 @@
                         <pre class="whitespace-pre-wrap bg-gray-50 rounded-md p-3 text-sm">{{ task.instructions or 'No instructions provided' }}</pre>
                     </dd>
                 </div>
+                {% if task.error_message %}
+                <div class="bg-red-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-red-700">Error</dt>
+                    <dd class="mt-1 text-sm text-red-800 sm:col-span-2 sm:mt-0">
+                        <pre class="whitespace-pre-wrap bg-red-100 rounded-md p-3 text-sm">{{ task.error_message }}</pre>
+                    </dd>
+                </div>
+                {% endif %}
+                {% if task.result %}
+                <div class="bg-green-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-green-700">Result</dt>
+                    <dd class="mt-1 text-sm text-green-800 sm:col-span-2 sm:mt-0">
+                        <pre class="whitespace-pre-wrap bg-green-100 rounded-md p-3 text-sm">{{ task.result }}</pre>
+                    </dd>
+                </div>
+                {% endif %}
             </dl>
         </div>
     </div>

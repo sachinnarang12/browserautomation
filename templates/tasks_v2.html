@@ -42,13 +42,16 @@
                                     <div class="font-medium text-gray-900">{{ task.name }}</div>
                                     <div class="mt-1 text-gray-500 truncate max-w-xs">{{ task.url or '' }}</div>
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                                <td class="px-3 py-4 text-sm">
                                     {% if task.status == 'completed' %}
                                     <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Completed</span>
                                     {% elif task.status == 'running' %}
                                     <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">Running</span>
                                     {% elif task.status == 'failed' %}
                                     <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">Failed</span>
+                                    {% if task.error_message %}
+                                    <p class="mt-1 text-xs text-red-600 max-w-xs truncate" title="{{ task.error_message }}">{{ task.error_message[:80] }}{% if task.error_message|length > 80 %}...{% endif %}</p>
+                                    {% endif %}
                                     {% else %}
                                     <span class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20">Pending</span>
                                     {% endif %}
