@@ -33,11 +33,19 @@ def run_task_now(task_id):
     
     # Create agent and run task
     agent = PortalAutomationAgent()
-    
+
     try:
-        result = agent.execute_task(task)
-        print(f"\n✅ Task completed successfully!")
-        return True
+        agent._execute_task(task['id'])
+
+        # Check result
+        executed_task = agent.tasks.get(task['id'])
+        if executed_task and executed_task.status.value == 'completed':
+            print(f"\n✅ Task completed successfully!")
+            print(f"Result: {executed_task.result}")
+            return True
+        else:
+            print(f"\n❌ Task failed: {executed_task.error_message if executed_task else 'unknown'}")
+            return False
     except Exception as e:
         print(f"\n❌ Task failed: {e}")
         return False

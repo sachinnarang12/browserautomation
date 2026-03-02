@@ -6,6 +6,7 @@ Allows users to schedule multiple activities throughout the day with status moni
 """
 
 import json
+import re
 import time
 import schedule
 import threading
@@ -15,6 +16,7 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 from enum import Enum
 from nova_act import NovaAct
+from credential_manager import CredentialManager
 import logging
 
 # Configure logging
@@ -181,6 +183,21 @@ class PortalAutomationAgent:
         logger.info(f"Updated task: {task_id}")
         return True
     
+    def _resolve_credentials(self, text: str) -> str:
+        """Replace {{credential:ID:field}} placeholders with actual values"""
+        pattern = r'\{\{credential:(\w+):(\w+)\}\}'
+        matches = re.findall(pattern, text)
+        if not matches:
+            return text
+        cm = CredentialManager()
+        for cred_id, field in matches:
+            cred = cm.get_credential(cred_id)
+            if cred and field in cred:
+                text = text.replace(f'{{{{credential:{cred_id}:{field}}}}}', cred[field])
+            else:
+                logger.warning(f"Could not resolve credential {cred_id}:{field}")
+        return text
+
     def _schedule_task(self, task: PortalTask):
         """Schedule a task with the scheduler"""
         if not task.enabled:
@@ -222,9 +239,10 @@ class PortalAutomationAgent:
             
             self.nova_sessions[task_id] = nova
             nova.start()
-            
-            # Execute the instructions
-            result = nova.act(task.instructions)
+
+            # Resolve credential placeholders and execute
+            instructions = self._resolve_credentials(task.instructions)
+            result = nova.act(instructions)
             
             # Update task with success
             task.status = TaskStatus.COMPLETED
