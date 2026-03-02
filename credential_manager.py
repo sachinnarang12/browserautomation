@@ -11,11 +11,33 @@ from pathlib import Path
 import getpass
 from datetime import datetime
 
+def _init_keyring():
+    """Initialize keyring with a working backend, falling back to file-based if needed."""
+    import os
+    import sys
+
+    # On headless Linux without a desktop session, the system keyring (SecretService/D-Bus)
+    # won't work. Detect this and use a file-based fallback.
+    needs_fallback = (
+        sys.platform == 'linux'
+        and not os.environ.get('DBUS_SESSION_BUS_ADDRESS')
+        and not os.environ.get('DISPLAY')
+    )
+
+    if needs_fallback:
+        try:
+            from keyrings.alt.file import PlaintextKeyring
+            keyring.set_keyring(PlaintextKeyring())
+        except ImportError:
+            pass
+
+_init_keyring()
+
 class CredentialManager:
     """Secure credential storage using system keyring"""
-    
+
     SERVICE_NAME = "PortalAutomationAgent"
-    
+
     def __init__(self):
         self.credentials_file = Path("credentials_index.json")
         self._load_index()
