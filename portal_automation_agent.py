@@ -69,6 +69,7 @@ class PortalAutomationAgent:
         self.scheduler_thread = None
         
         # Nova Act configuration
+        # headless=False so browser window is visible when running locally
         self.nova_config = {
             "headless": False,
             "tty": False,
@@ -96,7 +97,10 @@ class PortalAutomationAgent:
                 # Load Nova Act config if present
                 if 'nova_config' in data:
                     self.nova_config.update(data['nova_config'])
-                    
+
+                # Always default to visible browser for local runs
+                self.nova_config["headless"] = False
+
                 logger.info(f"Loaded {len(self.tasks)} tasks from config")
             except Exception as e:
                 logger.error(f"Error loading config: {e}")
