@@ -1,0 +1,100 @@
+{% extends "base_v2.html" %}
+
+{% block title %}{% if task %}Edit Task{% else %}New Task{% endif %} - Portal Automation Agent{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="min-w-0 flex-1">
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol role="list" class="flex items-center space-x-4">
+                    <li><a href="{{ url_for('tasks') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700">Tasks</a></li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="ml-4 text-sm font-medium text-gray-500">{% if task %}Edit{% else %}New{% endif %}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h2 class="text-2xl font-bold leading-7 text-gray-900">{% if task %}Edit Task{% else %}Create New Task{% endif %}</h2>
+        </div>
+    </div>
+
+    <div class="bg-white shadow sm:rounded-lg">
+        <form action="{% if task %}{{ url_for('edit_task', task_id=task.id) }}{% else %}{{ url_for('add_task') }}{% endif %}" method="POST">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-6 gap-6">
+                    <div class="col-span-6 sm:col-span-4">
+                        <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Task Name</label>
+                        <input type="text" name="name" id="name" required
+                               value="{{ task.name if task else '' }}"
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                               placeholder="e.g., Download Utility Bill">
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="url" class="block text-sm font-medium leading-6 text-gray-900">Target URL</label>
+                        <input type="url" name="url" id="url"
+                               value="{{ task.url if task else '' }}"
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                               placeholder="https://example.com/portal">
+                    </div>
+
+                    <div class="col-span-6">
+                        <label for="instructions" class="block text-sm font-medium leading-6 text-gray-900">Instructions</label>
+                        <textarea name="instructions" id="instructions" rows="5"
+                                  class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  placeholder="Step-by-step instructions for the automation agent...">{{ task.instructions if task else '' }}</textarea>
+                        <p class="mt-2 text-sm text-gray-500">Describe what the automation should do step by step.</p>
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <label for="scheduled_time" class="block text-sm font-medium leading-6 text-gray-900">Scheduled Time (HH:MM)</label>
+                        <input type="time" name="scheduled_time" id="scheduled_time"
+                               value="{{ task.scheduled_time if task else '' }}"
+                               class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <label class="block text-sm font-medium leading-6 text-gray-900">Options</label>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <input id="enabled" name="enabled" type="checkbox"
+                                       {% if task and task.enabled %}checked{% elif not task %}checked{% endif %}
+                                       class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                                <label for="enabled" class="ml-3 block text-sm leading-6 text-gray-900">Enable this task</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if credentials %}
+                    <div class="col-span-6 sm:col-span-4">
+                        <label for="credential" class="block text-sm font-medium leading-6 text-gray-900">Credential (optional)</label>
+                        <select name="credential" id="credential"
+                                class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option value="">-- Select Credential --</option>
+                            {% for cred in credentials %}
+                            <option value="{{ cred.id }}">{{ cred.id }} ({{ cred.username }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 text-right sm:px-6 rounded-b-lg">
+                <a href="{{ url_for('tasks') }}"
+                   class="mr-3 inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                    {% if task %}Update Task{% else %}Create Task{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

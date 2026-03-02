@@ -59,8 +59,9 @@ temp_*.py
 Thumbs.db
 desktop.ini
 
-# Nova Act Logs
-*.html
+# Nova Act Logs (exclude HTML in root, but keep templates/)
+/*.html
+!templates/
 
 # Kiro specific
 .kiro/

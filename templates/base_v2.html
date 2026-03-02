@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portal Automation Agent{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        {% if user and user.is_authenticated %}
+        <!-- Navigation -->
+        <nav class="bg-indigo-600">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <span class="text-white text-xl font-bold">Portal Agent</span>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="{{ url_for('dashboard') }}"
+                                   class="{% if request.endpoint == 'dashboard' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    Dashboard
+                                </a>
+                                <a href="{{ url_for('tasks') }}"
+                                   class="{% if request.endpoint in ['tasks', 'task_details', 'add_task', 'edit_task'] %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    Tasks
+                                </a>
+                                <a href="{{ url_for('credentials') }}"
+                                   class="{% if request.endpoint in ['credentials', 'add_credential'] %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    Credentials
+                                </a>
+                                {% if user.is_admin %}
+                                <a href="{{ url_for('users') }}"
+                                   class="{% if request.endpoint == 'users' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    Users
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <span class="text-indigo-200 text-sm mr-4">{{ user.username }}</span>
+                            <a href="{{ url_for('profile') }}"
+                               class="text-indigo-200 hover:text-white text-sm mr-4">Profile</a>
+                            <a href="{{ url_for('logout') }}"
+                               class="rounded-md bg-indigo-700 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-800">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                                class="inline-flex items-center justify-center rounded-md bg-indigo-700 p-2 text-indigo-200 hover:bg-indigo-500 hover:text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                    <a href="{{ url_for('dashboard') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Dashboard</a>
+                    <a href="{{ url_for('tasks') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Tasks</a>
+                    <a href="{{ url_for('credentials') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Credentials</a>
+                    {% if user.is_admin %}
+                    <a href="{{ url_for('users') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Users</a>
+                    {% endif %}
+                    <a href="{{ url_for('profile') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Profile</a>
+                    <a href="{{ url_for('logout') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Logout</a>
+                </div>
+            </div>
+        </nav>
+        {% endif %}
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+            {% for category, message in messages %}
+            <div class="rounded-md p-4 mb-2 {% if category == 'error' %}bg-red-50{% elif category == 'success' %}bg-green-50{% else %}bg-blue-50{% endif %}">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if category == 'error' %}
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                        </svg>
+                        {% elif category == 'success' %}
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                        </svg>
+                        {% else %}
+                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium {% if category == 'error' %}text-red-800{% elif category == 'success' %}text-green-800{% else %}text-blue-800{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Main content -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        {% if user and user.is_authenticated %}
+        <footer class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 mt-8">
+            <div class="border-t border-gray-200 pt-4">
+                <p class="text-center text-xs text-gray-400">Portal Automation Agent V2.0</p>
+            </div>
+        </footer>
+        {% endif %}
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends "base_v2.html" %}
+
+{% block title %}Profile - Portal Automation Agent{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <h2 class="text-2xl font-bold leading-7 text-gray-900 mb-8">Your Profile</h2>
+
+    <!-- Profile Info -->
+    <div class="bg-white shadow sm:rounded-lg mb-8">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-base font-semibold leading-6 text-gray-900">Account Information</h3>
+        </div>
+        <div class="border-t border-gray-200">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Username</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ user.username }}</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Email</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ user.email or 'Not set' }}</dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Role</dt>
+                    <dd class="mt-1 text-sm sm:col-span-2 sm:mt-0">
+                        {% if user.is_admin %}
+                        <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">Admin</span>
+                        {% else %}
+                        <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">User</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Account Created</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ user.created_at|datetime if user.created_at else 'Unknown' }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-base font-semibold leading-6 text-gray-900">Change Password</h3>
+            <p class="mt-1 text-sm text-gray-500">Update your account password.</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form action="{{ url_for('change_password') }}" method="POST">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="old_password" class="block text-sm font-medium leading-6 text-gray-900">Current Password</label>
+                            <input type="password" name="old_password" id="old_password" required
+                                   class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="new_password" class="block text-sm font-medium leading-6 text-gray-900">New Password</label>
+                            <input type="password" name="new_password" id="new_password" required
+                                   class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="confirm_password" class="block text-sm font-medium leading-6 text-gray-900">Confirm New Password</label>
+                            <input type="password" name="confirm_password" id="confirm_password" required
+                                   class="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 text-right sm:px-6 rounded-b-lg">
+                    <button type="submit"
+                            class="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
