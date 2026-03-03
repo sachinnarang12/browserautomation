@@ -38,8 +38,8 @@ print("""
    https://livingstonnj.my360-app.com
 
 2. 🔐 Login with:
-   Username: narang.sachin@gmail.com
-   Password: Testing1234!1
+   Username: {{credential:utility_portal:username}}
+   Password: {{credential:utility_portal:password}}
 
 3. 🏠 Select Active Home:
    - Look for "Active Home" dropdown

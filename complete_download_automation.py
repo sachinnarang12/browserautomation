@@ -53,7 +53,7 @@ try:
         starting_page="https://identity.my360-app.com/Account/Login?ReturnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fresponse_type%3Dcode%26client_id%3Dmy360-app%26state%3DVHZnalRySDdsbEFUaWpHUWktZEZrNUliR2lrYy1XUzJYWDdOVjZmRnFvMEQ0semicolon%25252Fdashboard%26redirect_uri%3Dhttps%253A%252F%252Flivingstonnj.my360-app.com%252F%26scope%3Dopenid%2520profile%2520offline_access%26code_challenge%3DclK8rXphATi0e_O9iK0eNojFKkUtEPAqfj2CKrNnC5Q%26code_challenge_method%3DS256%26nonce%3DVHZnalRySDdsbEFUaWpHUWktZEZrNUliR2lrYy1XUzJYWDdOVjZmRnFvMEQ0%26dns%3Dlivingstonnj",
         headless=False,  # Keep visible for monitoring
         tty=False,
-        nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+        nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
     )
 
     log_message("Starting Nova Act session...")
@@ -62,8 +62,8 @@ try:
     # Step 1: Complete Login Process
     log_message("Step 1: Logging in...")
     login_result = nova.act("""Complete the login process:
-    1. Enter username: narang.sachin@gmail.com
-    2. Enter password: Testing1234!1
+    1. Enter username: {{credential:utility_portal:username}}
+    2. Enter password: {{credential:utility_portal:password}}
     3. Click login/submit button
     4. Wait for the dashboard to load
     5. Confirm successful login by checking if you see account information

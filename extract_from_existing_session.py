@@ -1,3 +1,4 @@
+import os
 from nova_act import NovaAct
 import time
 from datetime import datetime
@@ -21,7 +22,6 @@ def save_extracted_data(data):
         log_message(f"💾 Data saved to: {filename}")
         
         # Try to open the file
-        import os
         os.startfile(filename)
         log_message(f"✅ Opened file: {filename}")
         
@@ -37,7 +37,7 @@ nova = NovaAct(
     starting_page="https://livingstonnj.my360-app.com/dashboard",
     headless=False,
     tty=False,
-    nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
 )
 
 try:
@@ -48,7 +48,7 @@ try:
     # Extract data from whatever page is currently visible
     extract_result = nova.act("""Read and extract ALL text and data visible on the current page:
 
-1. If you're on a login page, login with narang.sachin@gmail.com and Testing1234!12 first
+1. If you're on a login page, login with {{credential:utility_portal:username}} and {{credential:utility_portal:password}} first
 2. Navigate to Usage section if not already there
 3. Extract ALL usage information including:
    - Account details

@@ -7,10 +7,11 @@ Web-based interface for managing scheduled portal automation tasks.
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from datetime import datetime
 import json
+import os
 from portal_automation_agent import PortalAutomationAgent, TaskStatus
 
 app = Flask(__name__)
-app.secret_key = 'portal_agent_dashboard_secret_key'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(32).hex())
 
 # Global agent instance
 agent = PortalAutomationAgent()

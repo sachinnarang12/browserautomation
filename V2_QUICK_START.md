@@ -36,8 +36,8 @@ The dashboard will start on **http://localhost:5000**
    - **Credential ID**: `utility_portal` (no spaces)
    - **Description**: `Livingston NJ Utility Portal`
    - **URL**: `https://livingstonnj.my360-app.com`
-   - **Username**: `narang.sachin@gmail.com`
-   - **Password**: `Testing1234!123`
+   - **Username**: `YOUR_EMAIL`
+   - **Password**: `YOUR_PASSWORD`
 4. Click **Save Credential**
 
 ✅ Your password is now encrypted and stored in Windows Credential Manager!
@@ -81,7 +81,7 @@ This will:
 
 ### Old Way (V1 - Insecure)
 ```
-Login with username: narang.sachin@gmail.com and password: Testing1234!123
+Login with username: YOUR_EMAIL and password: YOUR_PASSWORD
 ```
 ❌ Password visible in plain text
 
@@ -194,7 +194,7 @@ taskkill /PID <process_id> /F
 python credential_manager.py list
 
 # Add credential manually
-python credential_manager.py add utility_portal narang.sachin@gmail.com Testing1234!123
+python credential_manager.py add utility_portal YOUR_EMAIL YOUR_PASSWORD
 ```
 
 ### Tasks Not Executing

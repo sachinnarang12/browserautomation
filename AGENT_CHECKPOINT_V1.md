@@ -129,7 +129,7 @@ agent_requirements.txt
 
 ## 🔧 Configuration Snapshot
 
-**Nova Act API Key**: `3371a1a7-d4f9-4aac-a9c7-9ded0ba21463`  
+**Nova Act API Key**: `YOUR_NOVA_ACT_API_KEY`  
 **Browser Mode**: Non-headless (visible)  
 **Retry Policy**: 3 attempts, 5-minute delay  
 **Storage**: JSON file (`agent_config.json`)  

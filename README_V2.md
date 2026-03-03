@@ -280,8 +280,8 @@ If you prefer manual control:
 ```python
 # 1. Add credential
 Credential ID: utility_portal
-Username: narang.sachin@gmail.com
-Password: Testing1234!123
+Username: YOUR_EMAIL
+Password: YOUR_PASSWORD
 URL: https://livingstonnj.my360-app.com
 
 # 2. Create task

@@ -26,7 +26,7 @@ A comprehensive collection of Nova Act automation scripts for downloading and ex
 - `agent_cli.py` - **NEW** - Command-line interface for managing portal automation tasks
 - `example_usage.py` - **NEW** - Comprehensive examples demonstrating Portal Automation Agent setup and usage
 - `quick_setup.py` - **NEW** - One-click setup script that creates your first scheduled task based on the working automation
-- `nova_extract_and_recreate.py` - **UPDATED** - Advanced data extraction script with password update (Testing1234!123)
+- `nova_extract_and_recreate.py` - **UPDATED** - Advanced data extraction script with password update (YOUR_PASSWORD)
 - `extract_from_existing_session.py` - Streamlined data extraction from existing browser sessions
 - `robust_nova_download.py` - Enhanced download automation with improved session handling
 - `fresh_live_download.py` - User-friendly automation with visual feedback
@@ -77,7 +77,7 @@ A comprehensive collection of Nova Act automation scripts for downloading and ex
 - `robust_nova_download.py` - Robust download automation with improved login redirect handling and enhanced session persistence
 - `fresh_live_download.py` - Fresh live download session with step-by-step visual monitoring and enhanced user experience
 - `simple_direct_download.py` - Minimal direct download approach with basic monitoring and automatic file opening
-- `simple_navigation_helper.py` - **RECENTLY UPDATED** - Navigation helper with password updated to `Testing1234!123` (use WORKING version for production)
+- `simple_navigation_helper.py` - **RECENTLY UPDATED** - Navigation helper with password updated to `YOUR_PASSWORD` (use WORKING version for production)
 - `watch_download_live.py` - Live download monitoring with real-time visual feedback and session persistence
 - `nova_final_simple.py` - Ultra-simplified final attempt with minimal complexity and maximum reliability
 - `nova_export_final.py` - Final optimized export automation with streamlined workflow and enhanced download monitoring
@@ -106,7 +106,7 @@ A comprehensive collection of Nova Act automation scripts for downloading and ex
 - `direct_api_download.py` - Direct HTTP requests approach for web scraping
 - Various blob download handlers and manual instruction files
 
-*Note: Nova Act automation scripts are for utility bill download automation and data extraction (development/testing purposes) and are not required for the main Flask application. These scripts use the standardized authentication credentials `narang.sachin@gmail.com` with password `Testing1234!12` for consistency across the automation workflow. The **WORKING_simple_navigation_helper.py** is the confirmed production-ready version with verified success metrics. The new **nova_extract_and_recreate.py** provides advanced data extraction capabilities that complement the file download automation, while **extract_from_existing_session.py** offers streamlined data extraction for quick access to usage information. Recent updates include optimized timing control with refined wait periods for efficient navigation, enhanced Usage History navigation with "More Details" button handling, automatic LastPass save password prompt handling, improved session management across scripts, and code quality improvements with refined instruction formatting and better string handling.*
+*Note: Nova Act automation scripts are for utility bill download automation and data extraction (development/testing purposes) and are not required for the main Flask application. These scripts use the standardized authentication credentials `YOUR_EMAIL` with password `YOUR_PASSWORD` for consistency across the automation workflow. The **WORKING_simple_navigation_helper.py** is the confirmed production-ready version with verified success metrics. The new **nova_extract_and_recreate.py** provides advanced data extraction capabilities that complement the file download automation, while **extract_from_existing_session.py** offers streamlined data extraction for quick access to usage information. Recent updates include optimized timing control with refined wait periods for efficient navigation, enhanced Usage History navigation with "More Details" button handling, automatic LastPass save password prompt handling, improved session management across scripts, and code quality improvements with refined instruction formatting and better string handling.*
 
 ## Quick Start
 
@@ -121,7 +121,7 @@ A comprehensive collection of Nova Act automation scripts for downloading and ex
    ```
 
 2. **Nova Act API Key**: Ensure you have a valid Nova Act API key
-   - The scripts use API key: `3371a1a7-d4f9-4aac-a9c7-9ded0ba21463`
+   - The scripts use API key: `YOUR_NOVA_ACT_API_KEY`
 
 3. **Account Access**: Ensure the utility account is unlocked before running automation
 
@@ -205,15 +205,15 @@ python example_usage.py
 ## Authentication Details
 
 Scripts use standardized credentials with two password variants:
-- **Username**: `narang.sachin@gmail.com`
-- **Password (Production)**: `Testing1234!12` - Used by `WORKING_simple_navigation_helper.py` (confirmed working version)
-- **Password (Advanced)**: `Testing1234!123` - Used by advanced scripts including:
+- **Username**: `YOUR_EMAIL`
+- **Password (Production)**: `YOUR_PASSWORD` - Used by `WORKING_simple_navigation_helper.py` (confirmed working version)
+- **Password (Advanced)**: `YOUR_PASSWORD` - Used by advanced scripts including:
   - `simple_navigation_helper.py` (recently updated)
   - `nova_extract_and_recreate.py`
   - `nova_read_pdf_content.py`
 - **Account**: `103892 0` (Active Home selection)
 
-**Note**: The production-ready `WORKING_simple_navigation_helper.py` continues to use `Testing1234!12` as the verified baseline. The `simple_navigation_helper.py` and advanced extraction scripts use `Testing1234!123` for enhanced authentication workflows.
+**Note**: The production-ready `WORKING_simple_navigation_helper.py` continues to use `YOUR_PASSWORD` as the verified baseline. The `simple_navigation_helper.py` and advanced extraction scripts use `YOUR_PASSWORD` for enhanced authentication workflows.
 
 ## Usage Workflow
 
@@ -247,7 +247,7 @@ Scripts use standardized credentials with two password variants:
 - **Enhanced Navigation Flow**: Includes specific "More Details" button navigation
 - **Manual Download Instructions**: Provides clear step-by-step instructions for Network tab method
 - **Session Persistence**: Keeps browser session open for manual intervention
-- **Standardized Authentication**: Uses consistent credentials (`narang.sachin@gmail.com` / `Testing1234!12`)
+- **Standardized Authentication**: Uses consistent credentials (`YOUR_EMAIL` / `YOUR_PASSWORD`)
 
 **Usage:**
 ```bash
@@ -345,7 +345,7 @@ The agent uses a JSON configuration file (`agent_config.json` by default) with t
   "nova_config": {
     "headless": false,
     "tty": false,
-    "nova_act_api_key": "3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    "nova_act_api_key": "YOUR_NOVA_ACT_API_KEY"
   }
 }
 ```
@@ -560,7 +560,7 @@ python quick_setup.py
    - **URL**: Complete Livingston NJ utility portal login URL
    - **Instructions**: Full automation workflow from the working script
    - **Schedule**: Daily execution at 9:00 AM
-   - **Credentials**: Uses updated password `Testing1234!123`
+   - **Credentials**: Uses updated password `YOUR_PASSWORD`
 3. **📊 Configuration Display**: Shows current task configuration and status
 4. **🎯 Next Steps Guide**: Provides clear instructions for:
    - Testing the task manually
@@ -595,7 +595,7 @@ python agent_cli.py status
 - **Schedule**: 9:00 AM daily
 - **Portal**: Livingston NJ utility portal
 - **Workflow**: Complete login → navigation → export → download verification
-- **Authentication**: Uses `narang.sachin@gmail.com` with `Testing1234!123`
+- **Authentication**: Uses `YOUR_EMAIL` with `YOUR_PASSWORD`
 - **Account**: Selects "103892 0" Active Home
 - **Export Format**: PDF export with download verification
 
@@ -630,7 +630,7 @@ The script creates `agent_config.json` with:
   "nova_config": {
     "headless": false,
     "tty": false,
-    "nova_act_api_key": "3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    "nova_act_api_key": "YOUR_NOVA_ACT_API_KEY"
   }
 }
 ```
@@ -952,13 +952,13 @@ WARNING: Please change the default password after first login!
 
 **Pattern 1 - Explicit Format:**
 ```
-username: narang.sachin@gmail.com and password: Testing1234!123
+username: YOUR_EMAIL and password: YOUR_PASSWORD
 ```
 
 **Pattern 2 - Email-Based:**
 ```
-login with narang.sachin@gmail.com / Testing1234!123
-Login using narang.sachin@gmail.com and Testing1234!123
+login with YOUR_EMAIL / YOUR_PASSWORD
+Login using YOUR_EMAIL and YOUR_PASSWORD
 ```
 
 **Usage:**
@@ -1069,7 +1069,7 @@ python agent_dashboard_v2.py
 
 ### Nova Act Data Extraction (`nova_extract_and_recreate.py`) - **RECENTLY UPDATED**
 
-**🔄 RECENT UPDATE**: Password updated to `Testing1234!123` for improved authentication reliability.
+**🔄 RECENT UPDATE**: Password updated to `YOUR_PASSWORD` for improved authentication reliability.
 
 An advanced Nova Act automation script that extracts and structures usage data directly from web pages:
 
@@ -1079,7 +1079,7 @@ An advanced Nova Act automation script that extracts and structures usage data d
 - **Multi-Format Output**: Saves extracted data to both JSON and text formats
 - **Visual Page Analysis**: Takes screenshots and provides detailed descriptions
 - **Session Persistence**: Keeps browser open for manual verification
-- **Updated Authentication**: Now uses password `Testing1234!123`
+- **Updated Authentication**: Now uses password `YOUR_PASSWORD`
 
 **Usage:**
 ```bash
@@ -1241,7 +1241,7 @@ python get_actual_data.py
 
 A specialized Nova Act automation script that focuses on extracting complete PDF content directly from the browser with comprehensive transcription capabilities:
 
-**🔄 RECENT UPDATE**: Password updated to `Testing1234!123` for improved authentication reliability and consistency with other scripts.
+**🔄 RECENT UPDATE**: Password updated to `YOUR_PASSWORD` for improved authentication reliability and consistency with other scripts.
 
 **Key Features:**
 - **Direct PDF Content Extraction**: Reads PDF content directly from browser after generation
@@ -1333,7 +1333,7 @@ python test_simple_nova.py
 **Test Configuration:**
 - **Target URL**: `https://demoqa.com/login` (safe demo site)
 - **Browser Mode**: Non-headless (visible browser window)
-- **API Key**: Uses standard Nova Act API key (`3371a1a7-d4f9-4aac-a9c7-9ded0ba21463`)
+- **API Key**: Uses standard Nova Act API key (`YOUR_NOVA_ACT_API_KEY`)
 - **Session Duration**: Approximately 20 seconds total execution time
 - **TTY Mode**: Disabled for consistent behavior
 
@@ -2305,8 +2305,8 @@ manager = CredentialManager()
 # Store credentials securely
 manager.store_credential(
     credential_id="utility_portal",
-    username="narang.sachin@gmail.com",
-    password="Testing1234!123",
+    username="YOUR_EMAIL",
+    password="YOUR_PASSWORD",
     description="Livingston NJ Utility Portal",
     url="https://livingstonnj.my360-app.com"
 )
@@ -2346,7 +2346,7 @@ $ python credential_manager.py add
 Credential ID (e.g., 'utility_portal'): utility_portal
 Description: Livingston NJ Utility Portal
 URL: https://livingstonnj.my360-app.com
-Username: narang.sachin@gmail.com
+Username: YOUR_EMAIL
 Password (hidden): ****************
 
 ✅ Credentials stored securely for 'utility_portal'
@@ -2361,7 +2361,7 @@ $ python credential_manager.py list
 ==================================================
 
 📌 utility_portal
-   Username: narang.sachin@gmail.com
+   Username: YOUR_EMAIL
    Description: Livingston NJ Utility Portal
    URL: https://livingstonnj.my360-app.com
    Created: 2026-02-10 14:30:45
@@ -2425,7 +2425,7 @@ nova = NovaAct(
     starting_page=creds["metadata"]["url"],
     headless=False,
     tty=False,
-    nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    nova_act_api_key="YOUR_NOVA_ACT_API_KEY"
 )
 
 nova.start()
@@ -2482,8 +2482,8 @@ python -c "import keyring; print('Keyring installed successfully')"
 **Migration from Hardcoded Credentials:**
 ```python
 # Before (hardcoded - not secure):
-username = "narang.sachin@gmail.com"
-password = "Testing1234!123"
+username = "YOUR_EMAIL"
+password = "YOUR_PASSWORD"
 
 # After (secure credential manager):
 from credential_manager import CredentialManager
@@ -2579,7 +2579,7 @@ Enter credential ID to test: utility_portal
 $ python test_credential_login.py utility_portal
 
 Testing credential: utility_portal
-Username: narang.sachin@gmail.com
+Username: YOUR_EMAIL
 URL: https://livingstonnj.my360-app.com
 
 Initializing browser...
@@ -2667,7 +2667,7 @@ url = cred['metadata'].get('url', 'N/A')
 - **Starting Page**: Full Livingston NJ utility portal login URL with OAuth parameters
 - **Headless Mode**: False (visible browser for verification)
 - **TTY Mode**: False (non-interactive terminal mode)
-- **API Key**: Uses standard Nova Act API key `3371a1a7-d4f9-4aac-a9c7-9ded0ba21463`
+- **API Key**: Uses standard Nova Act API key `YOUR_NOVA_ACT_API_KEY`
 
 **Login Instructions:**
 The script provides detailed instructions to Nova Act:
@@ -2787,12 +2787,12 @@ For additional automation and testing capabilities, see the various Nova Act and
 
 **Account Access**
 - **Account Locked**: Ensure the utility account is unlocked before running automation
-- **Authentication Errors**: Scripts use standardized credentials (`narang.sachin@gmail.com` / `Testing1234!12`)
+- **Authentication Errors**: Scripts use standardized credentials (`YOUR_EMAIL` / `YOUR_PASSWORD`)
 - **Login Redirect Issues**: Use `robust_nova_download.py` for improved redirect handling
 
 **Nova Act Issues**
 - **Browser Compatibility**: Nova Act scripts require Chrome/Chromium browser
-- **API Key**: Ensure Nova Act API key `3371a1a7-d4f9-4aac-a9c7-9ded0ba21463` is valid
+- **API Key**: Ensure Nova Act API key `YOUR_NOVA_ACT_API_KEY` is valid
 - **Session Persistence**: Most scripts keep browser sessions open for manual verification
 
 **Download Issues**
@@ -2840,10 +2840,10 @@ For additional automation and testing capabilities, see the various Nova Act and
 ### Recent Updates
 
 **Simple Navigation Helper Password Update (Latest)**
-- **Password Updated**: `simple_navigation_helper.py` password changed to `Testing1234!123` for consistency with advanced extraction scripts
+- **Password Updated**: `simple_navigation_helper.py` password changed to `YOUR_PASSWORD` for consistency with advanced extraction scripts
 - **Alignment with Data Extraction**: Now uses same password as `nova_extract_and_recreate.py` and `nova_read_pdf_content.py`
 - **Improved Authentication**: Enhanced authentication reliability across all automation workflows
-- **Note**: The confirmed working version `WORKING_simple_navigation_helper.py` continues to use `Testing1234!12` as the production-ready baseline
+- **Note**: The confirmed working version `WORKING_simple_navigation_helper.py` continues to use `YOUR_PASSWORD` as the production-ready baseline
 
 **Portal Automation Agent Enhancement (Previous)**
 - **Improved Configuration Loading**: Enhanced enum handling in `portal_automation_agent.py` for more reliable task status persistence
@@ -2851,7 +2851,7 @@ For additional automation and testing capabilities, see the various Nova Act and
 - **Enhanced Reliability**: Improved JSON configuration loading prevents issues when restarting the automation agent
 
 **Earlier Updates**
-- `nova_extract_and_recreate.py` updated with password: `Testing1234!123` (advanced extraction script)
+- `nova_extract_and_recreate.py` updated with password: `YOUR_PASSWORD` (advanced extraction script)
 - Standardized authentication credentials across all scripts
 - Enhanced timing control and session management
 - Improved error handling and logging

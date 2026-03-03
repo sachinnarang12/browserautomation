@@ -88,12 +88,12 @@ def selenium_utility_download():
         log_message("Entering credentials...")
         username_field = wait.until(EC.presence_of_element_located((By.ID, "Email")))
         username_field.clear()
-        username_field.send_keys("narang.sachin@gmail.com")
+        username_field.send_keys("{{credential:utility_portal:username}}")
         
         # Find and fill password
         password_field = driver.find_element(By.ID, "Password")
         password_field.clear()
-        password_field.send_keys("Testing1234!1")
+        password_field.send_keys("{{credential:utility_portal:password}}")
         
         # Click login button
         login_button = driver.find_element(By.XPATH, "//button[@type='submit']")

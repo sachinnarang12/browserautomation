@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import traceback
 
@@ -21,7 +22,7 @@ try:
         starting_page="https://www.google.com",
         headless=True,
         tty=False,
-        nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+        nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
     )
     print("✓ NovaAct instance created successfully")
     

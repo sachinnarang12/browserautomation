@@ -39,7 +39,7 @@ nova = NovaAct(
     starting_page="https://livingstonnj.my360-app.com/dashboard",
     headless=False,
     tty=False,
-    nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
 )
 
 nova.start()
@@ -49,8 +49,8 @@ try:
     # Step 1: Handle login (it should redirect to login page)
     log_message("🔐 Step 1: Handling login...")
     login_result = nova.act("""If you see a login page, login with:
-    - Username: narang.sachin@gmail.com
-    - Password: Testing1234!12
+    - Username: {{credential:utility_portal:username}}
+    - Password: {{credential:utility_portal:password}}
     
     If you're already logged in, describe what you see on the page.""")
     

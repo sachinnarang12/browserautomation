@@ -9,6 +9,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash
 from datetime import datetime
 import json
+import os
 import time
 from pathlib import Path
 
@@ -17,7 +18,7 @@ from credential_manager import CredentialManager
 from database import Database, Task as DBTask, Credential as DBCredential, Execution, TaskStatus
 
 app = Flask(__name__)
-app.secret_key = 'portal_agent_v2_secret_key_change_in_production'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(32).hex())
 
 # Initialize managers
 login_manager = LoginManager()

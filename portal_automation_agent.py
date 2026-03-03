@@ -6,6 +6,7 @@ Allows users to schedule multiple activities throughout the day with status moni
 """
 
 import json
+import os
 import re
 import time
 import schedule
@@ -70,11 +71,14 @@ class PortalAutomationAgent:
         
         # Nova Act configuration
         # headless=False so browser window is visible when running locally
+        nova_api_key = os.environ.get("NOVA_ACT_API_KEY")
+        if not nova_api_key:
+            logger.warning("NOVA_ACT_API_KEY not set in environment. Tasks will fail without it.")
         self.nova_config = {
             "headless": False,
             "tty": False,
             "ignore_https_errors": True,
-            "nova_act_api_key": "3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+            "nova_act_api_key": nova_api_key or ""
         }
         
         self.load_config()

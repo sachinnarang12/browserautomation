@@ -63,7 +63,7 @@ Follow the prompts:
 - **Scheduled time**: 09:00
 - **Instructions**:
 ```
-1. Login with username: narang.sachin@gmail.com and password: Testing1234!123
+1. Login with username: YOUR_EMAIL and password: YOUR_PASSWORD
 2. Wait for dashboard to load (10 seconds)
 3. Select Active Home dropdown and choose "103892 0"
 4. Navigate to Usage History section
@@ -77,7 +77,7 @@ Follow the prompts:
 ### Nova Act Configuration
 
 The agent uses these default Nova Act settings:
-- **API Key**: `3371a1a7-d4f9-4aac-a9c7-9ded0ba21463`
+- **API Key**: `YOUR_NOVA_ACT_API_KEY`
 - **Browser**: Chrome/Chromium (headless=False for debugging)
 - **Session Persistence**: Enabled for manual verification
 
@@ -102,7 +102,7 @@ Tasks are stored in `agent_config.json` with the following structure:
   "nova_config": {
     "headless": false,
     "tty": false,
-    "nova_act_api_key": "3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+    "nova_act_api_key": "YOUR_NOVA_ACT_API_KEY"
   }
 }
 ```

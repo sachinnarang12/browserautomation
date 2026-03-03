@@ -64,8 +64,8 @@ python agent_dashboard_v2.py
 2. Click "Add Credential"
 3. Add your utility portal credentials:
    - ID: `utility_portal`
-   - Username: `narang.sachin@gmail.com`
-   - Password: `Testing1234!123`
+   - Username: `YOUR_EMAIL`
+   - Password: `YOUR_PASSWORD`
    - URL: `https://livingstonnj.my360-app.com`
 
 ### Step 5: Migrate V1 Tasks (Optional)
@@ -123,7 +123,7 @@ python standalone_scheduler.py
 ### Before (V1)
 ```json
 {
-  "instructions": "Login with narang.sachin@gmail.com and password Testing1234!123"
+  "instructions": "Login with YOUR_EMAIL and password YOUR_PASSWORD"
 }
 ```
 ❌ **Password visible in plain text**

@@ -3,6 +3,7 @@
 Run Task Immediately - Execute a Nova Act task right now without scheduling
 """
 
+import os
 from nova_act import NovaAct
 import time
 from datetime import datetime
@@ -22,7 +23,7 @@ def main():
         starting_page="https://demoqa.com/login",
         headless=False,  # Keep browser visible
         tty=False,
-        nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+        nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
     )
     
     try:

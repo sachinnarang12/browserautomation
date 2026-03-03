@@ -32,8 +32,8 @@ try:
     # Step 2: Extract form data (you'd need to parse the HTML for hidden fields)
     # This is a simplified version - you'd need to extract CSRF tokens, etc.
     login_data = {
-        'Email': 'narang.sachin@gmail.com',
-        'Password': 'Testing1234!1',
+        'Email': '{{credential:utility_portal:username}}',
+        'Password': '{{credential:utility_portal:password}}',
         'RememberMe': 'false'
     }
     

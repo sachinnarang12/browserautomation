@@ -177,9 +177,10 @@ class Database:
                 print("   Password: admin123")
                 print("   ⚠️  Please change the password immediately!")
             
-            # Add default system config
+            # Add default system config (API keys loaded from environment)
+            import os
             configs = [
-                ('nova_act_api_key', '3371a1a7-d4f9-4aac-a9c7-9ded0ba21463', 'Nova Act API Key'),
+                ('nova_act_api_key', os.environ.get('NOVA_ACT_API_KEY', ''), 'Nova Act API Key (set NOVA_ACT_API_KEY env var)'),
                 ('scheduler_enabled', 'true', 'Enable automatic task scheduling'),
                 ('max_concurrent_tasks', '5', 'Maximum concurrent task executions'),
                 ('log_retention_days', '30', 'Days to retain execution logs'),

@@ -4,6 +4,7 @@ Diagnose Nova Act Issues
 Check system status and identify problems with Nova Act automation
 """
 
+import os
 import subprocess
 import sys
 import requests
@@ -95,7 +96,7 @@ def test_simple_nova_act():
             starting_page="https://google.com",
             headless=True,  # Use headless for testing
             tty=False,
-            nova_act_api_key="3371a1a7-d4f9-4aac-a9c7-9ded0ba21463"
+            nova_act_api_key=os.environ.get("NOVA_ACT_API_KEY", "")
         )
         
         log_message("🚀 Starting Nova Act test...")
