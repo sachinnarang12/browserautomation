@@ -203,6 +203,17 @@ class PortalAutomationAgent:
                 logger.warning(f"Could not resolve credential {cred_id}:{field}")
         return text
 
+    def _cleanup_stale_sessions(self, task_id: str):
+        """Stop and remove any existing Nova session for this task to prevent EPIPE errors"""
+        if task_id in self.nova_sessions:
+            try:
+                self.nova_sessions[task_id].stop()
+                logger.info(f"Cleaned up stale session for {task_id}")
+            except Exception as e:
+                logger.warning(f"Error cleaning up stale session for {task_id}: {e}")
+            finally:
+                del self.nova_sessions[task_id]
+
     def _schedule_task(self, task: PortalTask):
         """Schedule a task with the scheduler"""
         if not task.enabled:
@@ -235,35 +246,39 @@ class PortalAutomationAgent:
         task.last_run = datetime.now().isoformat()
         self.save_config()
         
+        nova = None
         try:
+            # Kill any stale browser processes before starting
+            self._cleanup_stale_sessions(task_id)
+
             # Create Nova Act session
             nova = NovaAct(
                 starting_page=task.url,
                 **self.nova_config
             )
-            
+
             self.nova_sessions[task_id] = nova
             nova.start()
 
             # Resolve credential placeholders and execute
             instructions = self._resolve_credentials(task.instructions)
             result = nova.act(instructions)
-            
+
             # Update task with success
             task.status = TaskStatus.COMPLETED
             task.result = str(result)
             task.retry_count = 0
-            
+
             logger.info(f"Task {task.name} completed successfully")
-            
+
         except Exception as e:
             logger.error(f"Task {task.name} failed: {e}")
-            
+
             # Update task with failure
             task.status = TaskStatus.FAILED
             task.error_message = str(e)
             task.retry_count += 1
-            
+
             # Schedule retry if under max retries
             if task.retry_count < task.max_retries:
                 retry_time = datetime.now() + timedelta(minutes=5)
@@ -271,17 +286,19 @@ class PortalAutomationAgent:
                     self._execute_task, task_id
                 ).tag(f"{task_id}_retry")
                 logger.info(f"Scheduled retry for task {task.name} at {retry_time}")
-        
+
         finally:
-            # Clean up Nova session
-            if task_id in self.nova_sessions:
+            # Always close the Nova session to prevent orphaned browser processes
+            if nova is not None:
                 try:
-                    # Keep session open for manual verification if needed
-                    # self.nova_sessions[task_id].stop()
-                    pass
-                except:
-                    pass
-            
+                    nova.stop()
+                    logger.info(f"Nova session closed for task {task.name}")
+                except Exception as cleanup_err:
+                    logger.warning(f"Error closing Nova session for {task.name}: {cleanup_err}")
+
+            # Remove from active sessions
+            self.nova_sessions.pop(task_id, None)
+
             self.save_config()
     
     def start_scheduler(self):
