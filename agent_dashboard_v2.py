@@ -421,7 +421,14 @@ def change_password():
 @login_required
 def run_task(task_id):
     """Execute a task immediately in a background thread"""
-    from portal_automation_agent import PortalAutomationAgent
+    try:
+        from portal_automation_agent import PortalAutomationAgent
+    except ImportError as e:
+        return jsonify({
+            'success': False,
+            'message': f'Cannot import automation agent: {e}. '
+                       f'Make sure nova-act is installed: pip install nova-act'
+        }), 500
 
     config_file = Path('agent_config.json')
     if not config_file.exists():
@@ -456,6 +463,14 @@ def run_task(task_id):
                 json.dump(data, f, indent=2)
         else:
             return jsonify({'success': False, 'message': 'Task is already running'}), 409
+
+    # Check API key is set before starting
+    if not os.environ.get('NOVA_ACT_API_KEY'):
+        return jsonify({
+            'success': False,
+            'message': 'NOVA_ACT_API_KEY environment variable is not set. '
+                       'Set it before running tasks: $env:NOVA_ACT_API_KEY="your-key"'
+        }), 400
 
     import threading
 
@@ -598,18 +613,32 @@ def api_credentials():
 
 @app.errorhandler(404)
 def not_found(error):
-    """404 error handler"""
-    return render_template('error.html', 
-                         error_code=404, 
+    """404 error handler - return JSON for API routes"""
+    if request.path.startswith('/api/'):
+        return jsonify({'success': False, 'message': 'Not found'}), 404
+    return render_template('error.html',
+                         error_code=404,
                          error_message='Page not found',
                          user=current_user if current_user.is_authenticated else None), 404
 
 @app.errorhandler(500)
 def internal_error(error):
-    """500 error handler"""
-    return render_template('error.html', 
-                         error_code=500, 
+    """500 error handler - return JSON for API routes"""
+    if request.path.startswith('/api/'):
+        return jsonify({'success': False, 'message': f'Server error: {error}'}), 500
+    return render_template('error.html',
+                         error_code=500,
                          error_message='Internal server error',
+                         user=current_user if current_user.is_authenticated else None), 500
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    """Catch-all error handler - ensures API routes always return JSON"""
+    if request.path.startswith('/api/'):
+        return jsonify({'success': False, 'message': f'Server error: {error}'}), 500
+    return render_template('error.html',
+                         error_code=500,
+                         error_message=str(error),
                          user=current_user if current_user.is_authenticated else None), 500
 
 # ============================================================================
