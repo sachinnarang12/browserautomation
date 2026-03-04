@@ -240,25 +240,66 @@ class PortalAutomationAgent:
         except Exception as e:
             logger.error(f"Error scheduling task {task.id}: {e}")
     
+    def _split_instructions(self, instructions: str) -> list:
+        """Split numbered instructions into individual steps.
+
+        Handles formats like:
+            1. Do something
+            2. Do something else
+        or:
+            Step 1: Do something
+            Step 2: Do something else
+
+        If no numbered steps are found, return the whole text as one step.
+        """
+        # Split on lines starting with a number followed by . or )
+        step_pattern = re.compile(r'(?:^|\n)\s*(?:step\s+)?\d+[\.\)]\s*', re.IGNORECASE)
+        parts = step_pattern.split(instructions)
+        # Filter out empty/whitespace-only parts and the preamble if it's just a header
+        steps = [p.strip() for p in parts if p.strip()]
+        if not steps:
+            return [instructions.strip()]
+        return steps
+
+    def _extract_wait_seconds(self, step_text: str) -> tuple:
+        """Extract explicit wait directives from a step and return (clean_text, wait_seconds).
+
+        E.g. "Click login. Then wait 1 minute" -> ("Click login.", 60)
+             "Select option. Wait 15 seconds" -> ("Select option.", 15)
+        """
+        wait_pattern = re.compile(
+            r'\.?\s*(?:then\s+)?wait\s+(\d+)\s*(second|seconds|sec|secs|minute|minutes|min|mins)\b.*',
+            re.IGNORECASE
+        )
+        match = wait_pattern.search(step_text)
+        if match:
+            amount = int(match.group(1))
+            unit = match.group(2).lower()
+            if unit.startswith('min'):
+                amount *= 60
+            clean = step_text[:match.start()].rstrip(' ,;')
+            return clean, amount
+        return step_text, 0
+
     def _execute_task(self, task_id: str):
-        """Execute a scheduled task"""
+        """Execute a scheduled task by running each instruction step individually"""
         if task_id not in self.tasks:
             logger.error(f"Task {task_id} not found")
             return
-            
+
         task = self.tasks[task_id]
-        
+
         if not task.enabled:
             logger.info(f"Task {task.name} is disabled, skipping")
             return
-            
+
         logger.info(f"Starting execution of task: {task.name}")
-        
+
         # Update task status
         task.status = TaskStatus.RUNNING
         task.last_run = datetime.now().isoformat()
         self.save_config()
-        
+
         nova = None
         try:
             # Kill any stale browser processes before starting
@@ -273,16 +314,36 @@ class PortalAutomationAgent:
             self.nova_sessions[task_id] = nova
             nova.start()
 
-            # Resolve credential placeholders and execute
+            # Resolve credential placeholders
             instructions = self._resolve_credentials(task.instructions)
-            result = nova.act(instructions)
+
+            # Split into individual steps and execute each one
+            steps = self._split_instructions(instructions)
+            logger.info(f"Task {task.name}: split into {len(steps)} step(s)")
+
+            results = []
+            for i, raw_step in enumerate(steps, 1):
+                step_text, wait_secs = self._extract_wait_seconds(raw_step)
+                logger.info(f"Task {task.name} - Step {i}/{len(steps)}: {step_text[:120]}")
+
+                result = nova.act(step_text)
+                results.append(f"Step {i}: {result}")
+                logger.info(f"Task {task.name} - Step {i} result: {result}")
+
+                # Honour explicit wait directives (e.g. "wait 1 minute")
+                if wait_secs > 0:
+                    logger.info(f"Task {task.name} - Waiting {wait_secs}s as instructed")
+                    time.sleep(wait_secs)
+                elif i < len(steps):
+                    # Brief pause between steps to let the page settle
+                    time.sleep(3)
 
             # Update task with success
             task.status = TaskStatus.COMPLETED
-            task.result = str(result)
+            task.result = '\n'.join(results)
             task.retry_count = 0
 
-            logger.info(f"Task {task.name} completed successfully")
+            logger.info(f"Task {task.name} completed successfully ({len(steps)} steps)")
 
         except Exception as e:
             logger.error(f"Task {task.name} failed: {e}")
