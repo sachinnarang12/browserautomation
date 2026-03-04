@@ -434,18 +434,53 @@ def run_task(task_id):
     if not task:
         return jsonify({'success': False, 'message': f'Task {task_id} not found'}), 404
 
+    # Detect stale "running" tasks (stuck for more than 10 minutes)
     if task.get('status') == 'running':
-        return jsonify({'success': False, 'message': 'Task is already running'}), 409
+        last_run = task.get('last_run')
+        stale = False
+        if last_run:
+            try:
+                started_at = datetime.fromisoformat(last_run.replace('Z', '+00:00'))
+                if (datetime.now() - started_at).total_seconds() > 600:
+                    stale = True
+            except Exception:
+                stale = True
+        else:
+            stale = True
+
+        if stale:
+            # Reset the stuck task so it can be re-run
+            task['status'] = 'pending'
+            task['error_message'] = 'Previous run was stuck and has been reset'
+            with open(config_file, 'w') as f:
+                json.dump(data, f, indent=2)
+        else:
+            return jsonify({'success': False, 'message': 'Task is already running'}), 409
 
     import threading
 
     def run_in_background(tid):
+        """Run task in background thread with crash-safe status updates"""
         try:
             agent = PortalAutomationAgent()
             agent._execute_task(tid)
         except Exception as e:
+            # If the agent constructor or _execute_task crashes before
+            # it can update the config, we must reset the status here
             import logging
             logging.getLogger(__name__).error(f"Background task {tid} failed: {e}")
+            try:
+                with open('agent_config.json', 'r') as f:
+                    cfg = json.load(f)
+                for t in cfg.get('tasks', []):
+                    if t['id'] == tid and t.get('status') == 'running':
+                        t['status'] = 'failed'
+                        t['error_message'] = f'Task crashed: {e}'
+                        break
+                with open('agent_config.json', 'w') as f:
+                    json.dump(cfg, f, indent=2)
+            except Exception:
+                pass
 
     thread = threading.Thread(target=run_in_background, args=(task_id,), daemon=True)
     thread.start()
@@ -478,6 +513,45 @@ def task_status(task_id):
         'error_message': task.get('error_message'),
         'retry_count': task.get('retry_count', 0)
     })
+
+@app.route('/api/task/<task_id>/reset', methods=['POST'])
+@login_required
+def reset_task(task_id):
+    """Reset a stuck task back to pending"""
+    config_file = Path('agent_config.json')
+    if not config_file.exists():
+        return jsonify({'success': False, 'message': 'No config found'}), 404
+
+    with open(config_file, 'r') as f:
+        data = json.load(f)
+
+    task = next((t for t in data['tasks'] if t['id'] == task_id), None)
+    if not task:
+        return jsonify({'success': False, 'message': 'Task not found'}), 404
+
+    task['status'] = 'pending'
+    task['error_message'] = None
+
+    with open(config_file, 'w') as f:
+        json.dump(data, f, indent=2)
+
+    return jsonify({'success': True, 'message': 'Task has been reset to pending'})
+
+@app.route('/api/task/<task_id>/logs')
+@login_required
+def task_logs(task_id):
+    """Return the last 50 lines of portal_agent.log related to this task"""
+    log_file = Path('portal_agent.log')
+    lines = []
+    if log_file.exists():
+        try:
+            with open(log_file, 'r') as f:
+                all_lines = f.readlines()
+            # Return the last 100 lines (they include task context)
+            lines = [l.rstrip() for l in all_lines[-100:]]
+        except Exception:
+            pass
+    return jsonify({'success': True, 'lines': lines})
 
 @app.route('/api/status')
 @login_required

@@ -75,6 +75,12 @@
                                             {% if task.status == 'running' %}disabled{% endif %}>
                                         Run
                                     </button>
+                                    {% if task.status == 'running' or task.status == 'failed' %}
+                                    <button onclick="resetTask('{{ task.id }}')"
+                                            class="text-yellow-600 hover:text-yellow-900 mr-3">
+                                        Reset
+                                    </button>
+                                    {% endif %}
                                     <a href="{{ url_for('task_details', task_id=task.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
                                     <a href="{{ url_for('edit_task', task_id=task.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
                                 </td>
@@ -118,12 +124,24 @@ async function runTask(taskId, btn) {
 
         if (data.success) {
             btn.textContent = 'Running...';
+            const startTime = Date.now();
             const poll = setInterval(async () => {
-                const s = await fetch(`/api/task/${taskId}/status`);
-                const sd = await s.json();
-                if (sd.status === 'completed' || sd.status === 'failed') {
+                // Timeout after 10 minutes
+                if ((Date.now() - startTime) > 10 * 60 * 1000) {
                     clearInterval(poll);
+                    alert('Task appears stuck. Use the Reset button, then try again.');
                     location.reload();
+                    return;
+                }
+                try {
+                    const s = await fetch(`/api/task/${taskId}/status`);
+                    const sd = await s.json();
+                    if (sd.status === 'completed' || sd.status === 'failed') {
+                        clearInterval(poll);
+                        location.reload();
+                    }
+                } catch (e) {
+                    // keep polling on network hiccup
                 }
             }, 3000);
         } else {
@@ -135,6 +153,20 @@ async function runTask(taskId, btn) {
         alert('Error: ' + err.message);
         btn.disabled = false;
         btn.textContent = origText;
+    }
+}
+
+async function resetTask(taskId) {
+    try {
+        const resp = await fetch(`/api/task/${taskId}/reset`, { method: 'POST' });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Error: ' + err.message);
     }
 }
 </script>

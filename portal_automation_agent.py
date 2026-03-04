@@ -98,9 +98,14 @@ class PortalAutomationAgent:
                     task = PortalTask(**task_data)
                     self.tasks[task.id] = task
                     
-                # Load Nova Act config if present
+                # Load Nova Act config if present, but preserve env var API key
                 if 'nova_config' in data:
-                    self.nova_config.update(data['nova_config'])
+                    saved_config = data['nova_config']
+                    # Never let a blank saved key overwrite the env var
+                    env_key = os.environ.get("NOVA_ACT_API_KEY", "")
+                    self.nova_config.update(saved_config)
+                    if env_key:
+                        self.nova_config["nova_act_api_key"] = env_key
 
                 # Always default to visible browser for local runs
                 self.nova_config["headless"] = False
@@ -122,9 +127,13 @@ class PortalAutomationAgent:
                 task_dict['status'] = task.status.value
                 tasks_data.append(task_dict)
             
+            # Never persist the API key to the config file
+            safe_nova_config = {k: v for k, v in self.nova_config.items()
+                                if k != 'nova_act_api_key'}
+
             data = {
                 'tasks': tasks_data,
-                'nova_config': self.nova_config,
+                'nova_config': safe_nova_config,
                 'last_updated': datetime.now().isoformat()
             }
             

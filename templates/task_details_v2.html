@@ -27,6 +27,12 @@
                     {% if task.status == 'running' %}disabled{% endif %}>
                 Run Now
             </button>
+            {% if task.status == 'running' or task.status == 'failed' %}
+            <button onclick="resetTask('{{ task.id }}')"
+                    class="inline-flex items-center rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400">
+                Reset
+            </button>
+            {% endif %}
             <a href="{{ url_for('edit_task', task_id=task.id) }}"
                class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                 Edit
@@ -123,6 +129,20 @@
         </div>
     </div>
 
+    <!-- Execution Logs -->
+    <div class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <h3 class="text-base font-semibold leading-6 text-gray-900">Execution Logs</h3>
+            <button onclick="loadLogs('{{ task.id }}')"
+                    class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
+                Refresh Logs
+            </button>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
+            <pre id="log-output" class="whitespace-pre-wrap bg-gray-900 text-green-400 rounded-md p-4 text-xs font-mono max-h-64 overflow-y-auto">Click "Refresh Logs" to load execution logs...</pre>
+        </div>
+    </div>
+
     <!-- Run status banner (hidden by default) -->
     <div id="run-status" class="hidden mt-6 rounded-md p-4">
         <div class="flex">
@@ -136,6 +156,8 @@
 
 <script>
 let pollInterval = null;
+let pollStartTime = null;
+const POLL_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 async function runTaskNow(taskId) {
     const btn = document.getElementById('run-now-btn');
@@ -150,6 +172,7 @@ async function runTaskNow(taskId) {
         if (data.success) {
             btn.textContent = 'Running...';
             showStatus('running', data.message);
+            pollStartTime = Date.now();
             pollInterval = setInterval(() => pollStatus(taskId), 3000);
         } else {
             btn.disabled = false;
@@ -164,6 +187,15 @@ async function runTaskNow(taskId) {
 }
 
 async function pollStatus(taskId) {
+    // Stop polling if it's been running too long
+    if (pollStartTime && (Date.now() - pollStartTime) > POLL_TIMEOUT_MS) {
+        clearInterval(pollInterval);
+        showStatus('error', 'Task appears stuck (no update for 10 minutes). Use the Reset button, then try again.');
+        document.getElementById('run-now-btn').textContent = 'Run Now';
+        document.getElementById('run-now-btn').disabled = false;
+        return;
+    }
+
     try {
         const resp = await fetch(`/api/task/${taskId}/status`);
         const data = await resp.json();
@@ -179,11 +211,46 @@ async function pollStatus(taskId) {
             showStatus('error', 'Task failed: ' + (data.error_message || 'Unknown error'));
             document.getElementById('run-now-btn').textContent = 'Run Now';
             document.getElementById('run-now-btn').disabled = false;
+            setTimeout(() => location.reload(), 2000);
         }
     } catch (err) {
         // keep polling on network hiccup
     }
 }
+
+async function resetTask(taskId) {
+    try {
+        const resp = await fetch(`/api/task/${taskId}/reset`, { method: 'POST' });
+        const data = await resp.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+async function loadLogs(taskId) {
+    const el = document.getElementById('log-output');
+    el.textContent = 'Loading...';
+    try {
+        const resp = await fetch(`/api/task/${taskId}/logs`);
+        const data = await resp.json();
+        if (data.lines && data.lines.length) {
+            el.textContent = data.lines.join('\n');
+            el.scrollTop = el.scrollHeight;
+        } else {
+            el.textContent = 'No logs available yet.';
+        }
+    } catch (err) {
+        el.textContent = 'Error loading logs: ' + err.message;
+    }
+}
+
+// Auto-load logs on page load
+document.addEventListener('DOMContentLoaded', () => loadLogs('{{ task.id }}'));
 
 function showStatus(type, message) {
     const banner = document.getElementById('run-status');
