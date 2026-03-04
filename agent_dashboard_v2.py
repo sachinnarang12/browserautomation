@@ -19,6 +19,10 @@ from database import Database, Task as DBTask, Credential as DBCredential, Execu
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(32).hex())
+# Ensure error handlers work even in debug mode (otherwise Flask
+# propagates exceptions to Werkzeug's HTML debugger, breaking JSON APIs)
+app.config['PROPAGATE_EXCEPTIONS'] = False
+app.config['TRAP_HTTP_EXCEPTIONS'] = False
 
 # Initialize managers
 login_manager = LoginManager()
@@ -422,12 +426,25 @@ def change_password():
 def run_task(task_id):
     """Execute a task immediately in a background thread"""
     try:
-        from portal_automation_agent import PortalAutomationAgent
-    except ImportError as e:
+        return _run_task_inner(task_id)
+    except Exception as e:
+        # Absolute safety net - always return JSON, never crash
         return jsonify({
             'success': False,
-            'message': f'Cannot import automation agent: {e}. '
-                       f'Make sure nova-act is installed: pip install nova-act'
+            'message': f'Unexpected server error: {type(e).__name__}: {e}'
+        }), 500
+
+
+def _run_task_inner(task_id):
+    """Inner logic for run_task, separated so the outer handler can catch everything"""
+    # Test import before doing anything else
+    try:
+        from portal_automation_agent import PortalAutomationAgent
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Cannot import automation agent: {type(e).__name__}: {e}. '
+                       f'Run: pip install nova-act schedule'
         }), 500
 
     config_file = Path('agent_config.json')
@@ -702,4 +719,4 @@ if __name__ == '__main__':
     print("WARNING: Please change the default password after first login!")
     print("=" * 60)
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
