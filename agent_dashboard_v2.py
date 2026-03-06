@@ -374,6 +374,40 @@ def delete_credential(credential_id):
     return redirect(url_for('credentials'))
 
 # ============================================================================
+# Settings Routes
+# ============================================================================
+
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    """Agent settings page"""
+    config_file = Path('agent_config.json')
+
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            data = json.load(f)
+    else:
+        data = {'tasks': [], 'nova_config': {}, 'download_dir': ''}
+
+    if request.method == 'POST':
+        data['download_dir'] = request.form.get('download_dir', '').strip()
+        nova = data.setdefault('nova_config', {})
+        nova['headless'] = request.form.get('headless') == 'on'
+        nova['ignore_https_errors'] = request.form.get('ignore_https_errors') == 'on'
+        data['last_updated'] = datetime.now().isoformat()
+
+        with open(config_file, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        flash('Settings saved successfully', 'success')
+        return redirect(url_for('settings'))
+
+    return render_template('settings.html',
+                         download_dir=data.get('download_dir', ''),
+                         nova_config=data.get('nova_config', {}),
+                         user=current_user)
+
+# ============================================================================
 # User Management Routes (Admin Only)
 # ============================================================================
 

@@ -1,0 +1,78 @@
+{% extends "base_v2.html" %}
+
+{% block title %}Settings - Portal Automation Agent{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="min-w-0 flex-1">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+                Settings
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">Configure agent behavior and file paths</p>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('settings') }}">
+        <div class="space-y-6">
+            <!-- Download Settings -->
+            <div class="bg-white shadow sm:rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900">Download Directory</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>Set the folder where downloaded files (PDFs, exports, etc.) will be saved during task execution.</p>
+                    </div>
+                    <div class="mt-5 sm:flex sm:items-center">
+                        <div class="w-full sm:max-w-lg">
+                            <label for="download_dir" class="sr-only">Download directory</label>
+                            <input type="text" name="download_dir" id="download_dir"
+                                   value="{{ download_dir }}"
+                                   placeholder="C:\Users\naran\Downloads"
+                                   class="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-400">
+                        Example: <code>C:\Users\naran\Downloads</code> (Windows) or <code>/home/user/Downloads</code> (Linux)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Nova Act Settings -->
+            <div class="bg-white shadow sm:rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900">Browser Settings</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>Configure how the automation browser behaves.</p>
+                    </div>
+                    <div class="mt-5 space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="headless" id="headless"
+                                   {% if nova_config.get('headless') %}checked{% endif %}
+                                   class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                            <label for="headless" class="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                Headless mode (run browser without visible window)
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="ignore_https_errors" id="ignore_https_errors"
+                                   {% if nova_config.get('ignore_https_errors') %}checked{% endif %}
+                                   class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                            <label for="ignore_https_errors" class="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                                Ignore HTTPS certificate errors
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Save Settings
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

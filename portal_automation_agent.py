@@ -8,6 +8,7 @@ Allows users to schedule multiple activities throughout the day with status moni
 import json
 import os
 import re
+import shutil
 import time
 import schedule
 import threading
@@ -80,7 +81,10 @@ class PortalAutomationAgent:
             "ignore_https_errors": True,
             "nova_act_api_key": nova_api_key or ""
         }
-        
+
+        # Download directory configuration (defaults to user's Downloads folder)
+        self.download_dir = ""
+
         self.load_config()
         
     def load_config(self):
@@ -110,6 +114,10 @@ class PortalAutomationAgent:
                 # Always default to visible browser for local runs
                 self.nova_config["headless"] = False
 
+                # Load download directory setting
+                if 'download_dir' in data:
+                    self.download_dir = data['download_dir']
+
                 logger.info(f"Loaded {len(self.tasks)} tasks from config")
             except Exception as e:
                 logger.error(f"Error loading config: {e}")
@@ -134,6 +142,7 @@ class PortalAutomationAgent:
             data = {
                 'tasks': tasks_data,
                 'nova_config': safe_nova_config,
+                'download_dir': self.download_dir,
                 'last_updated': datetime.now().isoformat()
             }
             
@@ -314,6 +323,31 @@ class PortalAutomationAgent:
             self.nova_sessions[task_id] = nova
             nova.start()
 
+            # Set up download handling so files go to the configured directory
+            downloaded_files = []
+            if self.download_dir:
+                download_path = Path(self.download_dir)
+                download_path.mkdir(parents=True, exist_ok=True)
+
+                def on_download(download):
+                    """Handle Playwright download events - save to configured directory"""
+                    suggested = download.suggested_filename
+                    dest = download_path / suggested
+                    logger.info(f"Download started: {suggested} -> {dest}")
+                    try:
+                        download.save_as(str(dest))
+                        downloaded_files.append(str(dest))
+                        logger.info(f"Download saved: {dest}")
+                    except Exception as dl_err:
+                        logger.error(f"Failed to save download {suggested}: {dl_err}")
+
+                try:
+                    page = nova.page
+                    page.on("download", on_download)
+                    logger.info(f"Download handler registered, saving to: {download_path}")
+                except Exception as dl_setup_err:
+                    logger.warning(f"Could not set up download handler: {dl_setup_err}")
+
             # Resolve credential placeholders
             instructions = self._resolve_credentials(task.instructions)
 
@@ -340,10 +374,14 @@ class PortalAutomationAgent:
 
             # Update task with success
             task.status = TaskStatus.COMPLETED
+            if downloaded_files:
+                results.append(f"Downloads: {', '.join(downloaded_files)}")
             task.result = '\n'.join(results)
             task.retry_count = 0
 
             logger.info(f"Task {task.name} completed successfully ({len(steps)} steps)")
+            if downloaded_files:
+                logger.info(f"Downloaded files: {downloaded_files}")
 
         except Exception as e:
             logger.error(f"Task {task.name} failed: {e}")

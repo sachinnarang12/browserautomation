@@ -35,6 +35,10 @@
                                    class="{% if request.endpoint in ['credentials', 'add_credential'] %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
                                     Credentials
                                 </a>
+                                <a href="{{ url_for('settings') }}"
+                                   class="{% if request.endpoint == 'settings' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    Settings
+                                </a>
                                 {% if user.is_admin %}
                                 <a href="{{ url_for('users') }}"
                                    class="{% if request.endpoint == 'users' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
@@ -72,6 +76,7 @@
                     <a href="{{ url_for('dashboard') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Dashboard</a>
                     <a href="{{ url_for('tasks') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Tasks</a>
                     <a href="{{ url_for('credentials') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Credentials</a>
+                    <a href="{{ url_for('settings') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Settings</a>
                     {% if user.is_admin %}
                     <a href="{{ url_for('users') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Users</a>
                     {% endif %}
