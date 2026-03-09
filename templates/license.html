@@ -1,0 +1,86 @@
+{% extends "base_v2.html" %}
+
+{% block title %}License - AutomatePortal{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">License Management</h1>
+
+    <!-- Current License Status -->
+    <div class="bg-white shadow-lg rounded-xl p-6 mb-6 border border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Current License</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-sm text-gray-500">Plan</p>
+                <p class="text-xl font-bold text-indigo-600">{{ license_info.limits.label if license_info.limits else 'Trial' }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-sm text-gray-500">Status</p>
+                <p class="text-xl font-bold {% if license_info.valid %}text-green-600{% else %}text-red-600{% endif %}">
+                    {% if license_info.valid %}Active{% else %}Expired{% endif %}
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-sm text-gray-500">Expires</p>
+                <p class="text-xl font-bold text-gray-900">{{ license_info.expires[:10] if license_info.expires else 'N/A' }}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-sm text-gray-500">Days Left</p>
+                <p class="text-xl font-bold {% if license_info.days_remaining > 30 %}text-green-600{% elif license_info.days_remaining > 7 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                    {{ license_info.days_remaining }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Limits -->
+        <div class="mt-6">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Plan Limits</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {% if license_info.limits %}
+                <div class="text-center p-3 bg-indigo-50 rounded-lg">
+                    <p class="text-2xl font-bold text-indigo-600">{{ license_info.limits.max_tasks }}</p>
+                    <p class="text-xs text-gray-500">Tasks</p>
+                </div>
+                <div class="text-center p-3 bg-indigo-50 rounded-lg">
+                    <p class="text-2xl font-bold text-indigo-600">{{ license_info.limits.max_credentials }}</p>
+                    <p class="text-xs text-gray-500">Credentials</p>
+                </div>
+                <div class="text-center p-3 bg-indigo-50 rounded-lg">
+                    <p class="text-2xl font-bold text-indigo-600">{{ license_info.limits.max_users }}</p>
+                    <p class="text-xs text-gray-500">Users</p>
+                </div>
+                <div class="text-center p-3 bg-indigo-50 rounded-lg">
+                    <p class="text-2xl font-bold text-indigo-600">{{ license_info.limits.max_executions_per_month }}</p>
+                    <p class="text-xs text-gray-500">Executions/mo</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Activate License -->
+    <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Activate License Key</h2>
+        <form action="{{ url_for('license_page') }}" method="POST">
+            <div class="space-y-4">
+                <div>
+                    <label for="license_key" class="block text-sm font-medium text-gray-700">License Key</label>
+                    <input type="text" id="license_key" name="license_key" required
+                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono tracking-wider"
+                           placeholder="AP-PRO-20270309-A3F2-8B4C1D2E">
+                </div>
+                <div>
+                    <label for="company" class="block text-sm font-medium text-gray-700">Company Name</label>
+                    <input type="text" id="company" name="company"
+                           class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                           placeholder="Your Company Name">
+                </div>
+                <button type="submit"
+                        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                    Activate License
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

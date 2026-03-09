@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatePortal - Installation Guide</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card: #fff; --text: #1e293b; --border: #e2e8f0; --success: #10b981; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        .hero { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); color: white; padding: 50px 40px; text-align: center; }
+        .hero h1 { font-size: 2.5em; font-weight: 800; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 30px; }
+        section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 30px 35px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        h2 { color: var(--primary); font-size: 1.5em; margin-bottom: 15px; border-bottom: 2px solid var(--primary); padding-bottom: 8px; }
+        h3 { margin: 20px 0 10px; }
+        p, li { margin: 8px 0; }
+        ul, ol { padding-left: 24px; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 0.9em; color: #be185d; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 18px; border-radius: 8px; overflow-x: auto; margin: 12px 0; font-size: 0.9em; }
+        pre code { background: none; color: inherit; padding: 0; }
+        .step { display: flex; gap: 15px; margin: 15px 0; }
+        .step-num { flex-shrink: 0; width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9em; }
+        .step-content { flex: 1; }
+        .callout { border-left: 4px solid var(--primary); background: #eff6ff; padding: 12px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+        .callout-warning { border-left-color: #f59e0b; background: #fffbeb; }
+        .callout-success { border-left-color: var(--success); background: #ecfdf5; }
+        .footer { text-align: center; padding: 30px; color: #94a3b8; font-size: 0.9em; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        th { background: var(--primary); color: white; padding: 10px 14px; text-align: left; }
+        td { padding: 8px 14px; border-bottom: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>AutomatePortal</h1>
+    <p>Customer Installation Guide</p>
+</div>
+
+<div class="container">
+
+<section>
+    <h2>System Requirements</h2>
+    <table>
+        <tr><th>Requirement</th><th>Minimum</th><th>Recommended</th></tr>
+        <tr><td>Operating System</td><td>Windows 10</td><td>Windows 10/11</td></tr>
+        <tr><td>Python</td><td>3.9</td><td>3.11+</td></tr>
+        <tr><td>RAM</td><td>4 GB</td><td>8 GB</td></tr>
+        <tr><td>Disk Space</td><td>500 MB</td><td>1 GB</td></tr>
+        <tr><td>Internet</td><td>Required</td><td>Broadband</td></tr>
+        <tr><td>Browser</td><td>Chrome / Edge</td><td>Latest Chrome</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>Installation Steps</h2>
+
+    <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+            <h3>Install Python</h3>
+            <p>Download Python 3.11 from <code>python.org/downloads</code></p>
+            <div class="callout-warning callout">
+                <strong>Important:</strong> Check <strong>"Add Python to PATH"</strong> during installation.
+            </div>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+            <h3>Extract AutomatePortal</h3>
+            <p>Extract the delivered ZIP file to your preferred location, e.g.:</p>
+            <pre><code>C:\AutomatePortal\</code></pre>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+            <h3>Run the Installer</h3>
+            <p>Open the extracted folder and double-click <code>install.bat</code></p>
+            <p>This will:</p>
+            <ul>
+                <li>Create an isolated Python virtual environment</li>
+                <li>Install all required dependencies</li>
+                <li>Initialize the database</li>
+                <li>Create application directories</li>
+                <li>Generate launcher shortcuts</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+            <h3>Launch AutomatePortal</h3>
+            <p>Double-click <code>Start AutomatePortal.bat</code></p>
+            <p>Your browser will automatically open to the setup wizard.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+            <h3>Complete Setup Wizard</h3>
+            <ol>
+                <li><strong>Set Admin Password</strong> &mdash; Replace the default password (min 8 characters)</li>
+                <li><strong>Enter API Key</strong> &mdash; Your Nova Act API key (provided separately)</li>
+                <li><strong>Configure Preferences</strong> &mdash; Company name, download directory, admin email</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+            <h3>Activate License</h3>
+            <p>After logging in, go to <strong>Settings &rarr; License</strong> and enter your license key.</p>
+            <pre><code>Format: AP-PRO-20270309-A3F2-8B4C1D2E</code></pre>
+        </div>
+    </div>
+
+    <div class="callout-success callout">
+        <strong>Done!</strong> AutomatePortal is now ready. Create your first automation task from the Tasks page.
+    </div>
+</section>
+
+<section>
+    <h2>Daily Usage</h2>
+    <h3>Starting the Application</h3>
+    <p>Double-click <code>Start AutomatePortal.bat</code> each time you want to use it.</p>
+
+    <h3>Stopping the Application</h3>
+    <p>Press <code>Ctrl+C</code> in the terminal window, or simply close the terminal.</p>
+
+    <h3>Accessing the Dashboard</h3>
+    <p>Open your browser to: <code>http://localhost:5000</code></p>
+</section>
+
+<section>
+    <h2>Troubleshooting</h2>
+    <table>
+        <tr><th>Problem</th><th>Solution</th></tr>
+        <tr><td>"Python is not recognized"</td><td>Reinstall Python and check "Add to PATH"</td></tr>
+        <tr><td>Port 5000 already in use</td><td>Close other apps using port 5000, or edit the port in <code>agent_dashboard_v2.py</code></td></tr>
+        <tr><td>Task execution fails</td><td>Verify your NOVA_ACT_API_KEY is correct in Settings</td></tr>
+        <tr><td>Browser doesn't open</td><td>Manually go to <code>http://localhost:5000</code></td></tr>
+        <tr><td>Forgot password</td><td>Delete <code>users.json</code> and restart &mdash; default admin/admin123 will be recreated</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>Support</h2>
+    <p>For technical support, contact your AutomatePortal administrator or email the support address provided with your license.</p>
+</section>
+
+</div>
+
+<div class="footer">
+    <p>AutomatePortal Installation Guide &bull; Confidential &bull; 2026</p>
+</div>
+
+</body>
+</html>

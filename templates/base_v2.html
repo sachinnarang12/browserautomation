@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Portal Automation Agent{% endblock %}</title>
+    <title>{% block title %}AutomatePortal{% endblock %}
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         [x-cloak] { display: none !important; }
@@ -19,7 +19,7 @@
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <span class="text-white text-xl font-bold">Portal Agent</span>
+                            <span class="text-white text-xl font-bold">AutomatePortal</span>
                         </div>
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
@@ -43,6 +43,10 @@
                                 <a href="{{ url_for('users') }}"
                                    class="{% if request.endpoint == 'users' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
                                     Users
+                                </a>
+                                <a href="{{ url_for('license_page') }}"
+                                   class="{% if request.endpoint == 'license_page' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
+                                    License
                                 </a>
                                 {% endif %}
                             </div>
@@ -79,6 +83,7 @@
                     <a href="{{ url_for('settings') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Settings</a>
                     {% if user.is_admin %}
                     <a href="{{ url_for('users') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Users</a>
+                    <a href="{{ url_for('license_page') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">License</a>
                     {% endif %}
                     <a href="{{ url_for('profile') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Profile</a>
                     <a href="{{ url_for('logout') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Logout</a>
@@ -130,7 +135,7 @@
         {% if user and user.is_authenticated %}
         <footer class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 mt-8">
             <div class="border-t border-gray-200 pt-4">
-                <p class="text-center text-xs text-gray-400">Portal Automation Agent V2.0</p>
+                <p class="text-center text-xs text-gray-400">AutomatePortal v2.0 &bull; {{ license_info.limits.label if license_info and license_info.limits else '' }}</p>
             </div>
         </footer>
         {% endif %}

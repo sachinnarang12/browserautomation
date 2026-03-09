@@ -16,6 +16,7 @@ from pathlib import Path
 from auth_manager import AuthManager, User
 from credential_manager import CredentialManager
 from database import Database, Task as DBTask, Credential as DBCredential, Execution, TaskStatus
+from license_manager import get_current_license, activate_license, validate_license_key, check_limit, TIER_LIMITS
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(32).hex())
@@ -40,12 +41,147 @@ def load_user(user_id):
     return auth_manager.get_user(user_id)
 
 # ============================================================================
+# Setup Wizard & License Routes
+# ============================================================================
+
+SETUP_FLAG_FILE = Path('data/.setup_complete')
+
+def is_setup_complete():
+    """Check if initial setup has been completed"""
+    return SETUP_FLAG_FILE.exists()
+
+@app.context_processor
+def inject_license():
+    """Make license info available in all templates"""
+    return {'license_info': get_current_license()}
+
+@app.route('/setup', methods=['GET', 'POST'])
+def setup_wizard():
+    """First-run setup wizard - forces password change and API key entry"""
+    if is_setup_complete():
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        api_key = request.form.get('api_key', '').strip()
+        company_name = request.form.get('company_name', '').strip()
+        download_dir = request.form.get('download_dir', '').strip()
+        admin_email = request.form.get('admin_email', '').strip()
+
+        # Validate password
+        if len(new_password) < 8:
+            flash('Password must be at least 8 characters', 'error')
+            return render_template('setup_wizard.html', default_download_dir=_default_download_dir())
+
+        if new_password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return render_template('setup_wizard.html', default_download_dir=_default_download_dir())
+
+        # Change admin password
+        admin_user = auth_manager.get_user_by_username('admin')
+        if admin_user:
+            from werkzeug.security import generate_password_hash
+            admin_user.password_hash = generate_password_hash(new_password)
+            auth_manager._save_users()
+
+        # Save API key to environment / config
+        if api_key:
+            os.environ['NOVA_ACT_API_KEY'] = api_key
+            # Also save to .env file for persistence
+            _update_env_file('NOVA_ACT_API_KEY', api_key)
+
+        # Save settings to config
+        config_file = Path('agent_config.json')
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                data = json.load(f)
+        else:
+            data = {'tasks': [], 'nova_config': {}}
+
+        data['download_dir'] = download_dir
+        data['company_name'] = company_name
+        data['admin_email'] = admin_email
+        data['setup_completed_at'] = datetime.now().isoformat()
+
+        with open(config_file, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        # Mark setup as complete
+        SETUP_FLAG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        SETUP_FLAG_FILE.write_text(datetime.now().isoformat())
+
+        flash('Setup complete! Please log in with your new password.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('setup_wizard.html', default_download_dir=_default_download_dir())
+
+
+def _default_download_dir():
+    """Get a sensible default download directory"""
+    home = Path.home()
+    downloads = home / 'Downloads'
+    return str(downloads) if downloads.exists() else str(home)
+
+
+def _update_env_file(key, value):
+    """Update or add a key in the .env file"""
+    env_file = Path('.env')
+    lines = []
+    found = False
+
+    if env_file.exists():
+        with open(env_file, 'r') as f:
+            lines = f.readlines()
+
+    new_lines = []
+    for line in lines:
+        if line.strip().startswith(f'{key}='):
+            new_lines.append(f'{key}={value}\n')
+            found = True
+        else:
+            new_lines.append(line)
+
+    if not found:
+        new_lines.append(f'{key}={value}\n')
+
+    with open(env_file, 'w') as f:
+        f.writelines(new_lines)
+
+
+@app.route('/license', methods=['GET', 'POST'])
+@login_required
+def license_page():
+    """License activation page"""
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        license_key = request.form.get('license_key', '').strip()
+        company = request.form.get('company', '').strip()
+
+        result = activate_license(license_key, company)
+        if result['valid']:
+            flash(result['message'], 'success')
+        else:
+            flash(result['message'], 'error')
+
+        return redirect(url_for('license_page'))
+
+    license_info = get_current_license()
+    return render_template('license.html', license_info=license_info, tiers=TIER_LIMITS, user=current_user)
+
+
+# ============================================================================
 # Authentication Routes
 # ============================================================================
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Login page"""
+    if not is_setup_complete():
+        return redirect(url_for('setup_wizard'))
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     
@@ -746,11 +882,14 @@ def timeago(value):
 # ============================================================================
 
 if __name__ == '__main__':
-    print("Starting Portal Automation Agent V2.0 Dashboard")
-    print("=" * 60)
-    print("Access the dashboard at: http://localhost:5000")
-    print("Default login: admin / admin123")
-    print("WARNING: Please change the default password after first login!")
-    print("=" * 60)
+    print()
+    print("  ╔══════════════════════════════════════════════════════╗")
+    print("  ║         AutomatePortal v2.0                         ║")
+    print("  ║         AI-Powered Browser Automation               ║")
+    print("  ╠══════════════════════════════════════════════════════╣")
+    print("  ║  Dashboard: http://localhost:5000                    ║")
+    print("  ║  Press Ctrl+C to stop the server                    ║")
+    print("  ╚══════════════════════════════════════════════════════╝")
+    print()
     
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
