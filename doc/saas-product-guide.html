@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatePortal - SaaS Product & Monetization Guide</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        .hero {
+            background: linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #06b6d4 100%);
+            color: white; padding: 60px 40px; text-align: center;
+        }
+        .hero h1 { font-size: 2.8em; margin-bottom: 10px; font-weight: 800; }
+        .hero .subtitle { font-size: 1.3em; opacity: 0.9; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
+        section {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 35px 40px; margin: 25px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        h2 { color: var(--primary); font-size: 1.8em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid var(--primary); }
+        h3 { color: var(--text); font-size: 1.3em; margin: 25px 0 12px; }
+        h4 { color: var(--text-light); font-size: 1.1em; margin: 18px 0 8px; }
+        p { margin: 10px 0; color: #334155; }
+        ul, ol { padding-left: 24px; margin: 10px 0; }
+        li { margin: 6px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.95em; }
+        th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; }
+        td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+        tr:nth-child(even) { background: #f8fafc; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 600; color: white; }
+        .badge-blue { background: var(--primary); }
+        .badge-green { background: var(--success); }
+        .badge-purple { background: var(--secondary); }
+        .badge-orange { background: var(--warning); color: #1e293b; }
+        .callout { border-left: 4px solid var(--primary); background: #eff6ff; padding: 15px 20px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .callout-success { border-left-color: var(--success); background: #ecfdf5; }
+        .callout-warning { border-left-color: var(--warning); background: #fffbeb; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 15px 0; font-size: 0.9em; }
+        code { background: #f1f5f9; padding: 2px 7px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; color: #be185d; }
+        pre code { background: none; color: inherit; padding: 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 15px 0; }
+        .card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+        .card h4 { margin-top: 0; color: var(--primary); }
+        .pricing-card { text-align: center; border: 2px solid var(--border); border-radius: 16px; padding: 30px 25px; transition: transform 0.2s; }
+        .pricing-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .pricing-card.featured { border-color: var(--primary); position: relative; }
+        .pricing-card.featured::before { content: "MOST POPULAR"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 3px 15px; border-radius: 20px; font-size: 0.75em; font-weight: 700; }
+        .price { font-size: 3em; font-weight: 800; color: var(--primary); }
+        .price span { font-size: 0.4em; color: var(--text-light); font-weight: 400; }
+        .feature-list { list-style: none; padding: 0; text-align: left; }
+        .feature-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .feature-list li::before { content: "✓ "; color: var(--success); font-weight: 700; }
+        .feature-list li.disabled { color: #cbd5e1; }
+        .feature-list li.disabled::before { content: "— "; color: #cbd5e1; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 3px; background: var(--primary); }
+        .timeline-item { position: relative; margin-bottom: 25px; }
+        .timeline-item::before { content: ''; position: absolute; left: -25px; top: 5px; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; border: 3px solid white; }
+        .timeline-item h4 { margin: 0; color: var(--primary); }
+        .timeline-item p { margin: 5px 0 0; }
+        .metric-box { text-align: center; padding: 20px; }
+        .metric-box .number { font-size: 2.5em; font-weight: 800; color: var(--primary); }
+        .metric-box .label { font-size: 0.9em; color: var(--text-light); }
+        .footer { text-align: center; padding: 40px; color: var(--text-light); font-size: 0.9em; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero h1 { font-size: 2em; } section { padding: 20px; } }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>AutomatePortal</h1>
+    <div class="subtitle">SaaS Product Packaging &amp; Monetization Strategy</div>
+    <p style="opacity:0.7; margin-top:15px;">From Side Project to Subscription Business &mdash; The Complete Playbook</p>
+</div>
+
+<div class="container">
+
+<!-- ==================== EXECUTIVE SUMMARY ==================== -->
+<section>
+    <h2>Executive Summary</h2>
+    <p>AutomatePortal is an <strong>AI-powered browser automation platform</strong> that enables businesses to automate repetitive web portal tasks &mdash; downloading reports, submitting forms, extracting data &mdash; without writing code. The platform uses natural language instructions powered by Nova Act AI, making it accessible to non-technical users.</p>
+
+    <h3>Market Opportunity</h3>
+    <div class="grid-3">
+        <div class="metric-box card">
+            <div class="number">$13.8B</div>
+            <div class="label">RPA Market Size by 2028</div>
+        </div>
+        <div class="metric-box card">
+            <div class="number">23.4%</div>
+            <div class="label">YoY Market Growth Rate</div>
+        </div>
+        <div class="metric-box card">
+            <div class="number">78%</div>
+            <div class="label">SMBs Want Automation</div>
+        </div>
+    </div>
+
+    <h3>Competitive Advantage</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>AI-First Approach</h4>
+            <p>Unlike traditional RPA tools (UiPath, Automation Anywhere) that require recording macros or visual scripting, AutomatePortal uses <strong>natural language instructions</strong>. Users describe what they want in plain English.</p>
+        </div>
+        <div class="card">
+            <h4>SMB-Friendly Pricing</h4>
+            <p>Enterprise RPA tools cost $5,000-50,000/year. AutomatePortal starts at <strong>$29/month</strong>, making automation accessible to small businesses and individual professionals.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PRICING ==================== -->
+<section>
+    <h2>Pricing Strategy</h2>
+
+    <div class="grid-3">
+        <div class="pricing-card">
+            <h3>Starter</h3>
+            <div class="price">$29<span>/month</span></div>
+            <p style="color: var(--text-light);">For individuals &amp; freelancers</p>
+            <ul class="feature-list">
+                <li>5 Automation Tasks</li>
+                <li>100 Executions/month</li>
+                <li>3 Stored Credentials</li>
+                <li>1 User</li>
+                <li>Daily Scheduling</li>
+                <li>7-Day History</li>
+                <li>Email Support</li>
+                <li class="disabled">Team Collaboration</li>
+                <li class="disabled">API Access</li>
+                <li class="disabled">Priority Support</li>
+            </ul>
+        </div>
+
+        <div class="pricing-card featured">
+            <h3>Professional</h3>
+            <div class="price">$79<span>/month</span></div>
+            <p style="color: var(--text-light);">For growing teams</p>
+            <ul class="feature-list">
+                <li>25 Automation Tasks</li>
+                <li>1,000 Executions/month</li>
+                <li>15 Stored Credentials</li>
+                <li>5 Team Members</li>
+                <li>Any-Frequency Scheduling</li>
+                <li>30-Day History</li>
+                <li>Email Notifications</li>
+                <li>Team Collaboration</li>
+                <li class="disabled">API Access</li>
+                <li class="disabled">SSO / SAML</li>
+            </ul>
+        </div>
+
+        <div class="pricing-card">
+            <h3>Enterprise</h3>
+            <div class="price">$199<span>/month</span></div>
+            <p style="color: var(--text-light);">For organizations</p>
+            <ul class="feature-list">
+                <li>Unlimited Tasks</li>
+                <li>10,000 Executions/month</li>
+                <li>Unlimited Credentials</li>
+                <li>25 Team Members</li>
+                <li>Cron-Based Scheduling</li>
+                <li>90-Day History</li>
+                <li>REST API Access</li>
+                <li>SSO / SAML Auth</li>
+                <li>Priority Support</li>
+                <li>Custom Integrations</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="callout">
+        <strong>Annual Discount:</strong> 20% off for annual plans ($278/yr Starter, $758/yr Professional, $1,910/yr Enterprise). This improves cash flow and reduces churn.
+    </div>
+
+    <h3>Add-On Revenue</h3>
+    <table>
+        <tr><th>Add-On</th><th>Price</th><th>Description</th></tr>
+        <tr><td>Extra Executions</td><td>$0.05/each</td><td>Beyond plan limits</td></tr>
+        <tr><td>Extra Users</td><td>$10/user/mo</td><td>Additional team members</td></tr>
+        <tr><td>Premium Support</td><td>$49/mo</td><td>Dedicated support channel, 4hr SLA</td></tr>
+        <tr><td>Custom Automation Dev</td><td>$150/hr</td><td>We build your automations for you</td></tr>
+        <tr><td>Onboarding Package</td><td>$500 one-time</td><td>Guided setup + 3 custom automations</td></tr>
+    </table>
+</section>
+
+<!-- ==================== TARGET CUSTOMERS ==================== -->
+<section>
+    <h2>Target Customer Segments</h2>
+
+    <div class="grid-2">
+        <div class="card">
+            <h4>Segment 1: Accountants &amp; Bookkeepers</h4>
+            <p><strong>Pain:</strong> Manually downloading bank statements, utility bills, and invoices from dozens of portals monthly.</p>
+            <p><strong>Value:</strong> Automate downloads across all client portals. Save 10-20 hours/month.</p>
+            <p><strong>Plan:</strong> Professional ($79/mo)</p>
+        </div>
+        <div class="card">
+            <h4>Segment 2: Property Managers</h4>
+            <p><strong>Pain:</strong> Managing utility accounts across multiple properties, downloading bills, monitoring usage.</p>
+            <p><strong>Value:</strong> Centralized automation for all property utility portals.</p>
+            <p><strong>Plan:</strong> Professional ($79/mo)</p>
+        </div>
+        <div class="card">
+            <h4>Segment 3: Small Business Owners</h4>
+            <p><strong>Pain:</strong> Time spent on repetitive web tasks &mdash; checking inventory, downloading reports, submitting forms.</p>
+            <p><strong>Value:</strong> Automate routine tasks with natural language. No coding required.</p>
+            <p><strong>Plan:</strong> Starter ($29/mo)</p>
+        </div>
+        <div class="card">
+            <h4>Segment 4: IT / Operations Teams</h4>
+            <p><strong>Pain:</strong> Legacy portals without APIs that require manual data extraction.</p>
+            <p><strong>Value:</strong> API-less integration via browser automation. Connect any web portal.</p>
+            <p><strong>Plan:</strong> Enterprise ($199/mo)</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== LAUNCH ROADMAP ==================== -->
+<section>
+    <h2>Launch Roadmap</h2>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <h4>Phase 1: Foundation (Weeks 1-4)</h4>
+            <p>Multi-tenancy, Stripe billing integration, signup flow, landing page, terms of service.</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Phase 2: Polish (Weeks 5-8)</h4>
+            <p>Onboarding wizard, email notifications, usage dashboard, plan enforcement, password reset flow.</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Phase 3: Launch (Weeks 9-10)</h4>
+            <p>Beta invite program (50 users), feedback collection, performance tuning, security audit.</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Phase 4: Growth (Weeks 11-16)</h4>
+            <p>Public launch, content marketing, SEO, affiliate program, Product Hunt launch.</p>
+        </div>
+        <div class="timeline-item">
+            <h4>Phase 5: Scale (Months 5-12)</h4>
+            <p>API access, webhooks, Zapier integration, mobile app, enterprise features (SSO, audit logs).</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== UNIT ECONOMICS ==================== -->
+<section>
+    <h2>Unit Economics &amp; Financial Projections</h2>
+
+    <h3>Cost Per Customer</h3>
+    <table>
+        <tr><th>Cost Item</th><th>Monthly / Customer</th><th>Notes</th></tr>
+        <tr><td>AWS Infrastructure</td><td>$2.50</td><td>Shared resources, amortized</td></tr>
+        <tr><td>Nova Act API Usage</td><td>$5.00</td><td>~200 executions avg at $0.025/exec</td></tr>
+        <tr><td>Stripe Fees</td><td>$2.60</td><td>2.9% + $0.30 on $79 avg</td></tr>
+        <tr><td>Support (amortized)</td><td>$3.00</td><td>Shared support team</td></tr>
+        <tr><td><strong>Total COGS</strong></td><td><strong>$13.10</strong></td><td></td></tr>
+    </table>
+
+    <h3>Revenue Projections (Year 1)</h3>
+    <table>
+        <tr><th>Month</th><th>Customers</th><th>MRR</th><th>Costs</th><th>Gross Profit</th></tr>
+        <tr><td>Month 1</td><td>10</td><td>$690</td><td>$218</td><td>$472</td></tr>
+        <tr><td>Month 3</td><td>50</td><td>$3,450</td><td>$742</td><td>$2,708</td></tr>
+        <tr><td>Month 6</td><td>150</td><td>$10,350</td><td>$2,052</td><td>$8,298</td></tr>
+        <tr><td>Month 9</td><td>350</td><td>$24,150</td><td>$4,672</td><td>$19,478</td></tr>
+        <tr><td>Month 12</td><td>600</td><td>$41,400</td><td>$7,947</td><td>$33,453</td></tr>
+    </table>
+
+    <div class="callout-success callout">
+        <strong>Target Metrics:</strong> Gross Margin &gt; 80% | LTV:CAC &gt; 3:1 | Monthly Churn &lt; 5% | Payback Period &lt; 3 months
+    </div>
+
+    <h3>Key SaaS Metrics to Track</h3>
+    <div class="grid-3">
+        <div class="card"><h4>MRR / ARR</h4><p>Monthly/Annual Recurring Revenue. The north star metric for subscription health.</p></div>
+        <div class="card"><h4>Churn Rate</h4><p>% of customers leaving per month. Target &lt; 5% for SMB SaaS.</p></div>
+        <div class="card"><h4>LTV</h4><p>Lifetime Value. Average revenue per customer over their lifetime.</p></div>
+        <div class="card"><h4>CAC</h4><p>Customer Acquisition Cost. Marketing + sales spend to acquire one customer.</p></div>
+        <div class="card"><h4>NRR</h4><p>Net Revenue Retention. Revenue from existing customers (upgrades - churn).</p></div>
+        <div class="card"><h4>Time to Value</h4><p>Minutes from signup to first successful automation. Target &lt; 15 minutes.</p></div>
+    </div>
+</section>
+
+<!-- ==================== TECHNICAL REQUIREMENTS FOR SAAS ==================== -->
+<section>
+    <h2>Technical Requirements for SaaS Launch</h2>
+
+    <h3>Must-Have Before Launch</h3>
+    <table>
+        <tr><th>#</th><th>Requirement</th><th>Priority</th><th>Effort</th></tr>
+        <tr><td>1</td><td>Multi-tenancy (tenant_id on all tables + row-level filtering)</td><td><span class="badge badge-purple">Critical</span></td><td>1 week</td></tr>
+        <tr><td>2</td><td>Stripe subscription billing (checkout, webhooks, portal)</td><td><span class="badge badge-purple">Critical</span></td><td>1 week</td></tr>
+        <tr><td>3</td><td>Self-service signup with email verification</td><td><span class="badge badge-purple">Critical</span></td><td>3 days</td></tr>
+        <tr><td>4</td><td>Plan enforcement middleware (task/execution limits)</td><td><span class="badge badge-purple">Critical</span></td><td>3 days</td></tr>
+        <tr><td>5</td><td>PostgreSQL migration (replace SQLite)</td><td><span class="badge badge-purple">Critical</span></td><td>2 days</td></tr>
+        <tr><td>6</td><td>Password reset via email</td><td><span class="badge badge-blue">High</span></td><td>2 days</td></tr>
+        <tr><td>7</td><td>Landing page with pricing</td><td><span class="badge badge-blue">High</span></td><td>3 days</td></tr>
+        <tr><td>8</td><td>Onboarding wizard (first task creation)</td><td><span class="badge badge-blue">High</span></td><td>2 days</td></tr>
+        <tr><td>9</td><td>Usage metering dashboard</td><td><span class="badge badge-blue">High</span></td><td>2 days</td></tr>
+        <tr><td>10</td><td>Terms of Service + Privacy Policy</td><td><span class="badge badge-blue">High</span></td><td>1 day</td></tr>
+        <tr><td>11</td><td>Transactional emails (welcome, invoice, alerts)</td><td><span class="badge badge-green">Medium</span></td><td>3 days</td></tr>
+        <tr><td>12</td><td>GDPR: data export + account deletion</td><td><span class="badge badge-green">Medium</span></td><td>2 days</td></tr>
+    </table>
+
+    <h3>Post-Launch Enhancements</h3>
+    <table>
+        <tr><th>#</th><th>Feature</th><th>Impact</th><th>Effort</th></tr>
+        <tr><td>1</td><td>REST API for Enterprise customers</td><td>Unlocks integrations + higher-tier sales</td><td>2 weeks</td></tr>
+        <tr><td>2</td><td>Webhooks (task completed, task failed)</td><td>Enables Zapier/Make integrations</td><td>1 week</td></tr>
+        <tr><td>3</td><td>Team collaboration (shared tasks/creds)</td><td>Drives multi-seat upgrades</td><td>1 week</td></tr>
+        <tr><td>4</td><td>SSO / SAML for Enterprise</td><td>Enterprise deal requirement</td><td>1 week</td></tr>
+        <tr><td>5</td><td>Mobile-responsive task monitoring</td><td>Check task status from phone</td><td>3 days</td></tr>
+        <tr><td>6</td><td>Zapier / Make native integration</td><td>Distribution + discovery channel</td><td>2 weeks</td></tr>
+        <tr><td>7</td><td>White-label option for agencies</td><td>Premium revenue stream</td><td>3 weeks</td></tr>
+    </table>
+</section>
+
+<!-- ==================== GO-TO-MARKET ==================== -->
+<section>
+    <h2>Go-to-Market Strategy</h2>
+
+    <h3>Marketing Channels</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>Content Marketing</h4>
+            <ul>
+                <li>Blog: "How to Automate [X] Portal Downloads"</li>
+                <li>YouTube tutorials showing automation setup</li>
+                <li>Case studies with early customers</li>
+                <li>SEO targeting "automate web portal", "download reports automatically"</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Community &amp; Launch</h4>
+            <ul>
+                <li>Product Hunt launch (target #1 Product of the Day)</li>
+                <li>Reddit r/smallbusiness, r/sysadmin, r/automation</li>
+                <li>Hacker News Show HN post</li>
+                <li>LinkedIn articles for B2B audience</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Partnerships</h4>
+            <ul>
+                <li>Accounting software integrations (QuickBooks, Xero)</li>
+                <li>Property management software partnerships</li>
+                <li>IT service provider channel partners</li>
+                <li>Affiliate program (20% recurring commission)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Paid Acquisition</h4>
+            <ul>
+                <li>Google Ads: "automate web portal", "RPA for small business"</li>
+                <li>LinkedIn Ads: targeting IT managers, ops teams</li>
+                <li>Retargeting: landing page visitors</li>
+                <li>Budget: Start at $1,000/mo, scale with CAC data</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Sales Funnel</h3>
+    <pre><code>  Landing Page Visitor (100%)
+         |
+         v
+  Free Trial Signup (8-12%)
+         |
+         v
+  Onboarding Complete / First Task (60%)
+         |
+         v
+  Active User (3+ tasks created) (40%)
+         |
+         v
+  Paid Conversion (25% of trials)
+         |
+         v
+  Expansion (upgrade plan) (15% of paid/year)
+    </code></pre>
+</section>
+
+<!-- ==================== LEGAL ==================== -->
+<section>
+    <h2>Legal &amp; Compliance Checklist</h2>
+
+    <div class="grid-2">
+        <div class="card">
+            <h4>Required Before Launch</h4>
+            <ul>
+                <li>Terms of Service</li>
+                <li>Privacy Policy (GDPR + CCPA compliant)</li>
+                <li>Cookie Consent Banner</li>
+                <li>Data Processing Agreement (DPA)</li>
+                <li>Business Entity Registration (LLC/Corp)</li>
+                <li>Business Insurance (E&O / Cyber)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Security &amp; Compliance</h4>
+            <ul>
+                <li>SOC 2 Type I (within 6 months of launch)</li>
+                <li>Data encryption at rest and in transit</li>
+                <li>Regular security penetration testing</li>
+                <li>Incident response plan</li>
+                <li>Data retention and deletion policies</li>
+                <li>Right to data portability (GDPR Art. 20)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="callout-warning callout">
+        <strong>Important:</strong> Since AutomatePortal stores customer credentials to third-party portals, security is paramount. Credential isolation via OS keyring (or AWS Secrets Manager in production) is a key differentiator and must be maintained. Consider SOC 2 compliance early to unlock enterprise deals.
+    </div>
+</section>
+
+</div>
+
+<div class="footer">
+    <p><strong>AutomatePortal</strong> &mdash; SaaS Product &amp; Monetization Guide v1.0</p>
+    <p>Confidential &bull; March 2026</p>
+</div>
+
+</body>
+</html>

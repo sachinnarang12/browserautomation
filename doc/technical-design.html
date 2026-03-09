@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomatePortal - Technical Design Document</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #7c3aed 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 3em; margin-bottom: 10px; font-weight: 800; }
+        .hero .subtitle { font-size: 1.3em; opacity: 0.9; margin-bottom: 20px; }
+        .hero .meta { font-size: 0.95em; opacity: 0.7; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+        .toc {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px 40px;
+            margin: 30px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .toc h2 { color: var(--primary); margin-bottom: 15px; font-size: 1.4em; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin: 8px 0; }
+        .toc a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 35px 40px;
+            margin: 25px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+        h3 { color: var(--text); font-size: 1.3em; margin: 25px 0 12px 0; }
+        h4 { color: var(--text-light); font-size: 1.1em; margin: 18px 0 8px 0; }
+        p { margin: 10px 0; color: #334155; }
+        ul, ol { padding-left: 24px; margin: 10px 0; }
+        li { margin: 5px 0; }
+        code {
+            background: #f1f5f9;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #be185d;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+        .diagram {
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        .diagram pre {
+            background: transparent;
+            color: var(--text);
+            text-align: left;
+            display: inline-block;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:nth-child(even) { background: #f8fafc; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+        }
+        .badge-blue { background: var(--primary); }
+        .badge-green { background: var(--success); }
+        .badge-purple { background: var(--secondary); }
+        .badge-orange { background: var(--warning); color: #1e293b; }
+        .badge-red { background: var(--danger); }
+        .callout {
+            border-left: 4px solid var(--primary);
+            background: #eff6ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .callout-warning {
+            border-left-color: var(--warning);
+            background: #fffbeb;
+        }
+        .callout-success {
+            border-left-color: var(--success);
+            background: #ecfdf5;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .card h4 { margin-top: 0; color: var(--primary); }
+        .flow-arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2em; }
+            section { padding: 20px; }
+        }
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+    <h1>AutomatePortal</h1>
+    <div class="subtitle">AI-Powered Browser Automation Platform &mdash; Technical Design Document</div>
+    <div class="meta">
+        Version 2.0 &bull; Confidential &bull; Last Updated: March 2026<br>
+        SaaS Product &bull; Subscription-Based Monetization
+    </div>
+</div>
+
+<div class="container">
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+        <li><a href="#architecture">High-Level Architecture</a></li>
+        <li><a href="#techstack">Tech Stack Decisions</a></li>
+        <li><a href="#structure">Project Structure</a></li>
+        <li><a href="#frontend">Frontend Patterns</a></li>
+        <li><a href="#backend">Backend Patterns</a></li>
+        <li><a href="#docker">Docker Build</a></li>
+        <li><a href="#aws">AWS Infrastructure Deep Dive</a></li>
+        <li><a href="#aws-services">AWS Services Used</a></li>
+        <li><a href="#dataflow">Data Flow</a></li>
+        <li><a href="#deployment">Deployment Flow</a></li>
+        <li><a href="#saas">SaaS &amp; Monetization Strategy</a></li>
+        <li><a href="#lessons">Lessons Learned</a></li>
+    </ol>
+</div>
+
+<!-- ==================== 1. HIGH-LEVEL ARCHITECTURE ==================== -->
+<section id="architecture">
+    <h2>1. High-Level Architecture</h2>
+
+    <p>AutomatePortal is a <strong>three-tier web application</strong> that enables businesses to automate repetitive browser-based tasks using AI-powered browser automation (Nova Act). The system follows a classic MVC pattern with clear separation of concerns.</p>
+
+    <h3>System Context Diagram</h3>
+    <div class="diagram">
+        <pre>
+    +---------------------+          +---------------------+
+    |                     |          |                     |
+    |    End User         |  HTTPS   |   AutomatePortal    |
+    |   (Web Browser)     +---------->   (Flask App)       |
+    |                     |          |                     |
+    +---------------------+          +--------+--+---------+
+                                              |  |
+                          +-------------------+  +-------------------+
+                          |                                          |
+                +---------v----------+                  +------------v---------+
+                |                    |                  |                      |
+                |   Nova Act API     |                  |   SQLite / RDS       |
+                | (Browser Automat.) |                  |   (Data Store)       |
+                |                    |                  |                      |
+                +--------------------+                  +----------------------+
+        </pre>
+    </div>
+
+    <h3>Three-Tier Architecture Diagram</h3>
+    <div class="diagram">
+        <pre>
+ +===========================================================================+
+ |                        PRESENTATION TIER                                  |
+ |                                                                           |
+ |   +------------------+  +------------------+  +-------------------+       |
+ |   |  Login Page      |  |  Dashboard       |  |  Task Manager     |       |
+ |   |  (login_v2.html) |  | (dashboard_v2)   |  | (tasks_v2.html)   |       |
+ |   +------------------+  +------------------+  +-------------------+       |
+ |                                                                           |
+ |   +------------------+  +------------------+  +-------------------+       |
+ |   |  Credentials     |  |  User Mgmt       |  |  Settings         |       |
+ |   | (credentials.html)|  | (users.html)     |  | (settings.html)   |       |
+ |   +------------------+  +------------------+  +-------------------+       |
+ |                                                                           |
+ |   Tailwind CSS  |  Jinja2 Templates  |  Responsive Design                |
+ +==================================+========================================+
+                                    |
+                              HTTP Routes
+                                    |
+ +==================================v========================================+
+ |                        APPLICATION TIER                                   |
+ |                                                                           |
+ |   +---------------------+   +------------------------+                   |
+ |   |  agent_dashboard_v2 |   |  portal_automation_    |                   |
+ |   |  (Flask Routes &    |   |  agent                 |                   |
+ |   |   View Controllers) |   |  (Task Scheduler &     |                   |
+ |   +---------------------+   |   Executor)            |                   |
+ |                              +------------------------+                   |
+ |                                                                           |
+ |   +---------------------+   +------------------------+                   |
+ |   |  auth_manager       |   |  credential_manager    |                   |
+ |   |  (Authentication &  |   |  (Secure Password      |                   |
+ |   |   User Management)  |   |   Storage via Keyring) |                   |
+ |   +---------------------+   +------------------------+                   |
+ +==================================+========================================+
+                                    |
+                              ORM / Keyring
+                                    |
+ +==================================v========================================+
+ |                          DATA TIER                                        |
+ |                                                                           |
+ |   +-------------------+  +--------------------+  +-------------------+    |
+ |   |  SQLite Database  |  |  System Keyring    |  |  Config Files     |    |
+ |   |  (portal_agent.db)|  |  (Encrypted Creds) |  |  (.env, JSON)     |    |
+ |   |                   |  |                    |  |                   |    |
+ |   |  - Users          |  |  - Passwords       |  |  - API Keys       |    |
+ |   |  - Tasks          |  |  - Secrets         |  |  - Settings       |    |
+ |   |  - Executions     |  |                    |  |                   |    |
+ |   |  - AuditLog       |  |                    |  |                   |    |
+ |   |  - Credentials    |  |                    |  |                   |    |
+ |   +-------------------+  +--------------------+  +-------------------+    |
+ +===========================================================================+
+        </pre>
+    </div>
+
+    <h3>Key Architectural Decisions</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>Monolithic First</h4>
+            <p>Start monolithic, evolve to microservices. A single Flask app reduces complexity for MVP while allowing future decomposition.</p>
+        </div>
+        <div class="card">
+            <h4>Server-Side Rendering</h4>
+            <p>Jinja2 templates over SPA. Faster initial loads, SEO-friendly, simpler deployment. API layer can be added later for mobile/3rd-party.</p>
+        </div>
+        <div class="card">
+            <h4>Credential Isolation</h4>
+            <p>Passwords stored in OS keyring, never in the database. Even a full DB compromise does not expose customer credentials.</p>
+        </div>
+        <div class="card">
+            <h4>Pluggable Automation</h4>
+            <p>Nova Act is the primary engine but Selenium is available as fallback. Strategy pattern allows swapping engines per task.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 2. TECH STACK ==================== -->
+<section id="techstack">
+    <h2>2. Tech Stack Decisions</h2>
+
+    <table>
+        <tr>
+            <th>Layer</th>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Why Chosen</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-blue">Backend</span></td>
+            <td>Python + Flask</td>
+            <td>3.9+ / 3.0+</td>
+            <td>Rapid development, rich ecosystem for automation, async-ready</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-blue">ORM</span></td>
+            <td>SQLAlchemy</td>
+            <td>2.0+</td>
+            <td>Database agnostic (SQLite &rarr; PostgreSQL/RDS migration path)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">Frontend</span></td>
+            <td>Jinja2 + Tailwind CSS</td>
+            <td>3.x / 3.x</td>
+            <td>Server-side rendering, utility-first CSS, no build step needed</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-purple">Automation</span></td>
+            <td>Nova Act</td>
+            <td>Latest</td>
+            <td>AI-powered browser automation, handles dynamic SPAs, natural language instructions</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-purple">Automation Alt</span></td>
+            <td>Selenium</td>
+            <td>4.x</td>
+            <td>Fallback engine for simpler, well-structured sites</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-orange">Security</span></td>
+            <td>Keyring + bcrypt</td>
+            <td>Latest</td>
+            <td>OS-level credential encryption, industry-standard password hashing</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-orange">Auth</span></td>
+            <td>Flask-Login + Flask-WTF</td>
+            <td>Latest</td>
+            <td>Session management, CSRF protection, remember-me support</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red">Scheduling</span></td>
+            <td>Schedule (Python)</td>
+            <td>1.x</td>
+            <td>Lightweight, in-process job scheduling (upgradable to Celery/SQS)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red">Container</span></td>
+            <td>Docker</td>
+            <td>Latest</td>
+            <td>Consistent environments, easy scaling, CI/CD integration</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red">Cloud</span></td>
+            <td>AWS (EB, RDS, CloudFormation)</td>
+            <td>N/A</td>
+            <td>Industry standard, auto-scaling, managed services, cost-effective at scale</td>
+        </tr>
+    </table>
+
+    <div class="callout">
+        <strong>Migration Path:</strong> SQLite &rarr; Amazon RDS (PostgreSQL) for production multi-tenant SaaS. The SQLAlchemy ORM abstraction makes this a configuration change, not a rewrite.
+    </div>
+</section>
+
+<!-- ==================== 3. PROJECT STRUCTURE ==================== -->
+<section id="structure">
+    <h2>3. Project Structure</h2>
+
+    <pre><code>browserautomation/
++-- doc/                            # Technical documentation (you are here)
+|   +-- technical-design.html       # This document
+|
++-- templates/                      # Jinja2 HTML templates
+|   +-- base_v2.html                # Base layout (nav, sidebar, footer)
+|   +-- login_v2.html               # Authentication page
+|   +-- dashboard_v2.html           # Main dashboard with stats
+|   +-- tasks_v2.html               # Task list with filters
+|   +-- task_details_v2.html        # Individual task view + history
+|   +-- task_form_v2.html           # Create/edit task form
+|   +-- credentials.html            # Credential management
+|   +-- credential_form.html        # Add/edit credentials
+|   +-- users.html                  # Admin user management
+|   +-- profile.html                # User profile + password
+|   +-- settings.html               # System settings
+|   +-- error.html                  # Error display page
+|
++-- .ebextensions/                  # AWS Elastic Beanstalk configs
+|   +-- 01_packages.config          # OS-level package installs
+|   +-- 02_python.config            # Python/pip configuration
+|   +-- 03_flask.config             # Flask-specific settings
+|   +-- 04_logging.config           # CloudWatch log streaming
+|
++-- cloudformation/                 # AWS Infrastructure as Code
+|   +-- infrastructure.yaml         # Full stack CloudFormation template
+|
++-- agent_dashboard_v2.py           # Main Flask web application
++-- portal_automation_agent.py      # Core automation engine
++-- database.py                     # SQLAlchemy models + DB init
++-- auth_manager.py                 # User authentication service
++-- credential_manager.py           # Secure credential storage
++-- agent_cli.py                    # CLI interface (legacy)
++-- migrate_v1_to_v2.py             # V1 to V2 migration tool
++-- standalone_scheduler.py         # Background task scheduler
+|
++-- requirements_v2.txt             # Python dependencies
++-- Dockerfile                      # Container build definition
++-- .env.example                    # Environment variable template
++-- .gitignore                      # Git exclusion rules
++-- portal_agent.db                 # SQLite database (dev only)
+    </code></pre>
+
+    <h3>Module Responsibility Map</h3>
+    <div class="diagram">
+        <pre>
+  agent_dashboard_v2.py          portal_automation_agent.py
+  +-------------------------+    +---------------------------+
+  | Flask Routes            |    | Task Scheduling           |
+  | Session Management      |--->| Nova Act Execution        |
+  | Template Rendering      |    | Credential Resolution     |
+  | Request Validation      |    | Retry Logic               |
+  +----------+--------------+    +------------+--------------+
+             |                                |
+             v                                v
+  auth_manager.py               credential_manager.py
+  +-------------------------+   +---------------------------+
+  | User CRUD               |   | Keyring Integration       |
+  | Password Hashing        |   | Metadata Indexing         |
+  | Role Management         |   | CRUD Operations           |
+  | Flask-Login Integration |   | Secure Retrieval          |
+  +----------+--------------+   +------------+--------------+
+             |                                |
+             +----------------+---------------+
+                              |
+                              v
+                     database.py
+                     +---------------------------+
+                     | SQLAlchemy Models          |
+                     | User, Task, Credential,   |
+                     | Execution, AuditLog,       |
+                     | SystemConfig              |
+                     | DB Init + Migrations       |
+                     +---------------------------+
+        </pre>
+    </div>
+</section>
+
+<!-- ==================== 4. FRONTEND PATTERNS ==================== -->
+<section id="frontend">
+    <h2>4. Frontend Patterns</h2>
+
+    <h3>Template Inheritance</h3>
+    <div class="diagram">
+        <pre>
+  base_v2.html  (Master Layout)
+  +---------------------------------------------------+
+  |  &lt;nav&gt; Top Navigation Bar &lt;/nav&gt;                   |
+  |  +------+  +------------------------------------+ |
+  |  | Side |  |                                    | |
+  |  | bar  |  |   {% block content %}              | |
+  |  |      |  |      (Child template renders here) | |
+  |  | Menu |  |   {% endblock %}                   | |
+  |  |      |  |                                    | |
+  |  +------+  +------------------------------------+ |
+  |  &lt;footer&gt; Flash Messages + Scripts &lt;/footer&gt;       |
+  +---------------------------------------------------+
+        |              |               |
+        v              v               v
+  dashboard_v2    tasks_v2       credentials
+  .html           .html          .html
+        </pre>
+    </div>
+
+    <h3>UI Component Patterns</h3>
+    <div class="grid-3">
+        <div class="card">
+            <h4>Tailwind Utility-First</h4>
+            <p>No custom CSS files. All styling via Tailwind utility classes loaded from CDN. Enables rapid prototyping and consistent design.</p>
+            <pre><code>&lt;div class="bg-white
+  rounded-lg shadow-md
+  p-6 mb-4"&gt;</code></pre>
+        </div>
+        <div class="card">
+            <h4>Responsive Navigation</h4>
+            <p>Collapsible sidebar for desktop, hamburger menu for mobile. Built with Tailwind responsive breakpoints (<code>md:</code>, <code>lg:</code>).</p>
+        </div>
+        <div class="card">
+            <h4>Flash Messages</h4>
+            <p>Server-side flash messages rendered as dismissible alerts. Categories: <code>success</code>, <code>error</code>, <code>warning</code>, <code>info</code>.</p>
+        </div>
+    </div>
+
+    <h3>Page Catalog</h3>
+    <table>
+        <tr>
+            <th>Page</th>
+            <th>Template</th>
+            <th>Purpose</th>
+            <th>Auth Required</th>
+        </tr>
+        <tr><td>Login</td><td>login_v2.html</td><td>User authentication</td><td>No</td></tr>
+        <tr><td>Dashboard</td><td>dashboard_v2.html</td><td>Stats overview, recent tasks, system status</td><td>Yes</td></tr>
+        <tr><td>Task List</td><td>tasks_v2.html</td><td>All tasks with filter/sort/search</td><td>Yes</td></tr>
+        <tr><td>Task Detail</td><td>task_details_v2.html</td><td>Full task info + execution history</td><td>Yes</td></tr>
+        <tr><td>Task Form</td><td>task_form_v2.html</td><td>Create/edit automation tasks</td><td>Yes</td></tr>
+        <tr><td>Credentials</td><td>credentials.html</td><td>Manage stored credentials</td><td>Yes</td></tr>
+        <tr><td>Credential Form</td><td>credential_form.html</td><td>Add/edit credentials securely</td><td>Yes</td></tr>
+        <tr><td>Users</td><td>users.html</td><td>Admin user management panel</td><td>Admin</td></tr>
+        <tr><td>Profile</td><td>profile.html</td><td>User profile + change password</td><td>Yes</td></tr>
+        <tr><td>Settings</td><td>settings.html</td><td>System configuration</td><td>Admin</td></tr>
+    </table>
+</section>
+
+<!-- ==================== 5. BACKEND PATTERNS ==================== -->
+<section id="backend">
+    <h2>5. Backend Patterns</h2>
+
+    <h3>Route Organization</h3>
+    <pre><code># agent_dashboard_v2.py - Route Pattern
+
+@app.route('/login', methods=['GET', 'POST'])     # Auth
+@app.route('/logout')                               # Auth
+@app.route('/dashboard')                            # Dashboard
+@app.route('/tasks')                                # Task CRUD
+@app.route('/tasks/&lt;int:id&gt;')                       # Task Detail
+@app.route('/tasks/new', methods=['GET', 'POST'])   # Task Create
+@app.route('/tasks/&lt;int:id&gt;/edit', methods=[...])   # Task Update
+@app.route('/tasks/&lt;int:id&gt;/delete', methods=[...]) # Task Delete
+@app.route('/tasks/&lt;int:id&gt;/run', methods=['POST']) # Task Execute
+@app.route('/credentials')                          # Credential List
+@app.route('/credentials/new', methods=[...])       # Credential Create
+@app.route('/users')                                # User Admin
+@app.route('/settings', methods=['GET', 'POST'])    # Settings
+@app.route('/profile', methods=['GET', 'POST'])     # User Profile</code></pre>
+
+    <h3>Authentication Flow</h3>
+    <div class="diagram">
+        <pre>
+  User submits login form
+          |
+          v
+  +-------------------+     No     +------------------+
+  | Authenticate      +----------->| Flash error msg  |
+  | (bcrypt verify)   |            | Redirect /login  |
+  +--------+----------+            +------------------+
+           | Yes
+           v
+  +-------------------+
+  | Create session    |
+  | (Flask-Login)     |
+  | Set remember_me   |
+  +--------+----------+
+           |
+           v
+  +-------------------+
+  | Redirect to       |
+  | /dashboard        |
+  +-------------------+
+
+  Protected Routes:
+  @login_required decorator
+  checks session on every request
+        </pre>
+    </div>
+
+    <h3>Database Models (Entity Relationship)</h3>
+    <div class="diagram">
+        <pre>
+  +------------------+       +-------------------+       +------------------+
+  |     User         |       |     Task          |       |   Credential     |
+  +------------------+       +-------------------+       +------------------+
+  | id (PK)          |       | id (PK)           |       | id (PK)          |
+  | username         |&lt;--+   | name              |   +--&gt;| name             |
+  | password_hash    |   |   | url               |   |   | username         |
+  | is_admin         |   |   | instructions      |   |   | description      |
+  | created_at       |   +---+ created_by (FK)   |   |   | url              |
+  +------------------+       | scheduled_time    |   |   | created_by (FK)  |
+           |                  | status            |   |   | created_at       |
+           |                  | max_retries       |   |   +------------------+
+           |                  | credential_id(FK) +---+          |
+           |                  | created_at        |              |
+           |                  +--------+----------+      System Keyring
+           |                           |                 (Actual passwords
+           |                           |                  stored here,
+           v                           v                  never in DB)
+  +------------------+       +-------------------+
+  |   AuditLog       |       |   Execution       |
+  +------------------+       +-------------------+
+  | id (PK)          |       | id (PK)           |
+  | user_id (FK)     |       | task_id (FK)      |
+  | action           |       | started_at        |
+  | details          |       | completed_at      |
+  | ip_address       |       | status            |
+  | timestamp        |       | result            |
+  +------------------+       | error_message     |
+                              | retry_count       |
+  +------------------+       +-------------------+
+  |  SystemConfig    |
+  +------------------+
+  | id (PK)          |
+  | key              |
+  | value            |
+  | updated_at       |
+  +------------------+
+        </pre>
+    </div>
+
+    <h3>Credential Resolution Pattern</h3>
+    <div class="callout">
+        <strong>Security Pattern:</strong> Task instructions use placeholders like <code>{{credential:5:username}}</code> and <code>{{credential:5:password}}</code>. At execution time, the agent resolves these against the keyring &mdash; passwords are never stored in task definitions, logs, or the database.
+    </div>
+
+    <pre><code># Credential placeholder resolution flow
+def _resolve_credentials(self, instructions):
+    pattern = r'\{\{credential:(\d+):(\w+)\}\}'
+    for match in re.finditer(pattern, instructions):
+        cred_id, field = match.groups()
+        credential = credential_manager.get_credential(cred_id)
+        instructions = instructions.replace(
+            match.group(0),
+            credential[field]
+        )
+    return instructions</code></pre>
+
+    <h3>Task Execution Engine</h3>
+    <div class="diagram">
+        <pre>
+  Scheduler triggers task at scheduled_time
+          |
+          v
+  +-------------------+
+  | Load task from DB |
+  +--------+----------+
+           |
+           v
+  +-------------------+
+  | Resolve credential|
+  | placeholders      |
+  +--------+----------+
+           |
+           v
+  +-------------------+
+  | Split multi-step  |
+  | instructions      |
+  +--------+----------+
+           |
+           v
+  +-------------------+     Failure    +------------------+
+  | Execute via       +--------------->| Retry?           |
+  | Nova Act API      |               | (count < max)    |
+  +--------+----------+               +--------+---------+
+           |                                    |
+           | Success                   Yes      |  No
+           v                           |        v
+  +-------------------+                |  +------------------+
+  | Save result to    |&lt;---------------+  | Mark as FAILED   |
+  | Execution table   |                  | Log error        |
+  | Mark COMPLETED    |                  +------------------+
+  +-------------------+
+        </pre>
+    </div>
+</section>
+
+<!-- ==================== 6. DOCKER BUILD ==================== -->
+<section id="docker">
+    <h2>6. Docker Build</h2>
+
+    <h3>Dockerfile</h3>
+    <pre><code># Production Dockerfile
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for browser automation
+RUN apt-get update && apt-get install -y \
+    chromium-driver \
+    libglib2.0-0 \
+    libnss3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements_v2.txt .
+RUN pip install --no-cache-dir -r requirements_v2.txt
+
+# Copy application code
+COPY . .
+
+# Environment configuration
+ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
+
+# Expose port
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s \
+    CMD curl -f http://localhost:5000/login || exit 1
+
+# Run application
+CMD ["python", "agent_dashboard_v2.py"]</code></pre>
+
+    <h3>Docker Compose (Production)</h3>
+    <pre><code># docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NOVA_ACT_API_KEY=${NOVA_ACT_API_KEY}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - DATABASE_URL=postgresql://user:pass@db:5432/automateportal
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - app-data:/app/data
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=automateportal
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: always
+
+  scheduler:
+    build: .
+    command: python standalone_scheduler.py
+    environment:
+      - NOVA_ACT_API_KEY=${NOVA_ACT_API_KEY}
+      - DATABASE_URL=postgresql://user:pass@db:5432/automateportal
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db-data:
+  app-data:</code></pre>
+
+    <h3>Build & Run Commands</h3>
+    <pre><code># Build the image
+docker build -t automateportal:latest .
+
+# Run locally
+docker run -p 5000:5000 \
+  -e NOVA_ACT_API_KEY=your_key \
+  -e FLASK_SECRET_KEY=your_secret \
+  automateportal:latest
+
+# Production with compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f web</code></pre>
+</section>
+
+<!-- ==================== 7. AWS INFRASTRUCTURE DEEP DIVE ==================== -->
+<section id="aws">
+    <h2>7. AWS Infrastructure Deep Dive</h2>
+
+    <h3>Production Architecture on AWS</h3>
+    <div class="diagram">
+        <pre>
+                            Internet
+                               |
+                        +------v------+
+                        |  Route 53   |
+                        |  (DNS)      |
+                        +------+------+
+                               |
+                        +------v------+
+                        | CloudFront  |
+                        | (CDN)       |
+                        +------+------+
+                               |
+                        +------v------+
+                        |    ALB      |
+                        | (Load      |
+                        |  Balancer) |
+                        +---+----+---+
+                            |    |
+               +------------+    +------------+
+               |                              |
+        +------v------+              +--------v----+
+        |  ECS/EB     |              |  ECS/EB     |
+        |  Instance 1 |              |  Instance 2 |
+        |  (Web App)  |              |  (Web App)  |
+        +------+------+              +------+------+
+               |                            |
+               +------------+---------------+
+                            |
+               +------------+---------------+
+               |            |               |
+        +------v------+ +---v--------+ +---v----------+
+        |  RDS        | | ElastiCache| | S3            |
+        |  PostgreSQL | | (Redis)    | | (File Storage)|
+        |  (Database) | | (Sessions) | | (Downloads)   |
+        +-------------+ +------------+ +---------------+
+               |
+        +------v------+
+        | Secrets     |
+        | Manager     |
+        | (API Keys)  |
+        +-------------+
+
+  Monitoring & Logging:
+  +-------------+  +-------------+  +-------------+
+  | CloudWatch  |  | X-Ray       |  | SNS Alerts  |
+  | (Logs &     |  | (Tracing)   |  | (Notif.)    |
+  | Metrics)    |  |             |  |             |
+  +-------------+  +-------------+  +-------------+
+        </pre>
+    </div>
+
+    <h3>VPC Network Design</h3>
+    <div class="diagram">
+        <pre>
+  +================================================================+
+  |                        VPC (10.0.0.0/16)                       |
+  |                                                                |
+  |  +-- Availability Zone A ----------+ +-- Availability Zone B -+|
+  |  |                                 | |                        ||
+  |  |  Public Subnet (10.0.1.0/24)   | | Public Subnet          ||
+  |  |  +---------------------------+  | | (10.0.2.0/24)          ||
+  |  |  | NAT Gateway              |  | | +--------------------+ ||
+  |  |  | ALB Node                  |  | | | ALB Node           | ||
+  |  |  +---------------------------+  | | +--------------------+ ||
+  |  |                                 | |                        ||
+  |  |  Private Subnet (10.0.3.0/24)  | | Private Subnet         ||
+  |  |  +---------------------------+  | | (10.0.4.0/24)          ||
+  |  |  | ECS Task (Web)            |  | | +--------------------+ ||
+  |  |  | ECS Task (Scheduler)      |  | | | ECS Task (Web)     | ||
+  |  |  +---------------------------+  | | +--------------------+ ||
+  |  |                                 | |                        ||
+  |  |  Data Subnet (10.0.5.0/24)     | | Data Subnet            ||
+  |  |  +---------------------------+  | | (10.0.6.0/24)          ||
+  |  |  | RDS Primary               |  | | +--------------------+ ||
+  |  |  | ElastiCache Node          |  | | | RDS Standby        | ||
+  |  |  +---------------------------+  | | +--------------------+ ||
+  |  +---------------------------------+ +------------------------+|
+  +================================================================+
+        </pre>
+    </div>
+
+    <h3>CloudFormation Stack Components</h3>
+    <table>
+        <tr><th>Resource</th><th>Type</th><th>Purpose</th><th>Configuration</th></tr>
+        <tr>
+            <td>VPC</td>
+            <td>AWS::EC2::VPC</td>
+            <td>Network isolation</td>
+            <td>10.0.0.0/16, DNS enabled</td>
+        </tr>
+        <tr>
+            <td>ALB</td>
+            <td>AWS::ElasticLoadBalancingV2</td>
+            <td>Traffic distribution</td>
+            <td>HTTPS termination, health checks</td>
+        </tr>
+        <tr>
+            <td>ECS Cluster</td>
+            <td>AWS::ECS::Cluster</td>
+            <td>Container orchestration</td>
+            <td>Fargate launch type</td>
+        </tr>
+        <tr>
+            <td>RDS</td>
+            <td>AWS::RDS::DBInstance</td>
+            <td>Production database</td>
+            <td>PostgreSQL 15, Multi-AZ, encrypted</td>
+        </tr>
+        <tr>
+            <td>ElastiCache</td>
+            <td>AWS::ElastiCache::Cluster</td>
+            <td>Session store + cache</td>
+            <td>Redis 7, single node (scale as needed)</td>
+        </tr>
+        <tr>
+            <td>S3 Bucket</td>
+            <td>AWS::S3::Bucket</td>
+            <td>File storage (downloads)</td>
+            <td>Versioned, encrypted, lifecycle rules</td>
+        </tr>
+        <tr>
+            <td>Secrets Manager</td>
+            <td>AWS::SecretsManager::Secret</td>
+            <td>API keys + DB credentials</td>
+            <td>Auto-rotation enabled</td>
+        </tr>
+        <tr>
+            <td>IAM Roles</td>
+            <td>AWS::IAM::Role</td>
+            <td>Service permissions</td>
+            <td>Least-privilege policies</td>
+        </tr>
+        <tr>
+            <td>CloudWatch</td>
+            <td>AWS::Logs::LogGroup</td>
+            <td>Centralized logging</td>
+            <td>30-day retention, metric filters</td>
+        </tr>
+    </table>
+
+    <h3>Auto-Scaling Configuration</h3>
+    <pre><code># ECS Service Auto Scaling
+Target Tracking Policy:
+  - Metric: Average CPU Utilization
+  - Target: 70%
+  - Min Tasks: 2
+  - Max Tasks: 10
+  - Scale-In Cooldown: 300s
+  - Scale-Out Cooldown: 60s
+
+# RDS Storage Auto Scaling
+  - Max Storage: 100 GB
+  - Storage Threshold: 80%</code></pre>
+
+    <h3>Cost Estimation (Monthly)</h3>
+    <table>
+        <tr><th>Service</th><th>Config</th><th>Est. Cost</th></tr>
+        <tr><td>ECS Fargate (2 tasks)</td><td>0.5 vCPU, 1GB RAM each</td><td>$30</td></tr>
+        <tr><td>RDS PostgreSQL</td><td>db.t3.micro, 20GB</td><td>$15</td></tr>
+        <tr><td>ALB</td><td>Standard</td><td>$18</td></tr>
+        <tr><td>ElastiCache</td><td>cache.t3.micro</td><td>$12</td></tr>
+        <tr><td>S3 + CloudFront</td><td>Minimal usage</td><td>$5</td></tr>
+        <tr><td>CloudWatch</td><td>Logs + metrics</td><td>$5</td></tr>
+        <tr><td>Secrets Manager</td><td>5 secrets</td><td>$2</td></tr>
+        <tr><td><strong>Total (Starter)</strong></td><td></td><td><strong>~$87/mo</strong></td></tr>
+    </table>
+    <div class="callout-success callout">
+        <strong>Cost Optimization:</strong> Start with smaller instances and scale up. Use Reserved Instances or Savings Plans for 30-60% savings once traffic patterns are established.
+    </div>
+</section>
+
+<!-- ==================== 8. AWS SERVICES USED ==================== -->
+<section id="aws-services">
+    <h2>8. AWS Services Used</h2>
+
+    <div class="grid-2">
+        <div class="card">
+            <h4>Compute</h4>
+            <ul>
+                <li><strong>ECS Fargate</strong> &mdash; Serverless container hosting for web app + scheduler</li>
+                <li><strong>Elastic Beanstalk</strong> &mdash; Alternative simplified deployment option</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Networking</h4>
+            <ul>
+                <li><strong>VPC</strong> &mdash; Isolated virtual network</li>
+                <li><strong>ALB</strong> &mdash; Application load balancer with HTTPS</li>
+                <li><strong>Route 53</strong> &mdash; DNS management + health checks</li>
+                <li><strong>CloudFront</strong> &mdash; CDN for static assets</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Database &amp; Storage</h4>
+            <ul>
+                <li><strong>RDS (PostgreSQL)</strong> &mdash; Managed relational database</li>
+                <li><strong>ElastiCache (Redis)</strong> &mdash; Session store + caching</li>
+                <li><strong>S3</strong> &mdash; File storage for downloads and reports</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Security</h4>
+            <ul>
+                <li><strong>Secrets Manager</strong> &mdash; API keys, DB credentials</li>
+                <li><strong>IAM</strong> &mdash; Role-based service access</li>
+                <li><strong>ACM</strong> &mdash; SSL/TLS certificate management</li>
+                <li><strong>WAF</strong> &mdash; Web application firewall</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Monitoring &amp; Logging</h4>
+            <ul>
+                <li><strong>CloudWatch</strong> &mdash; Logs, metrics, alarms, dashboards</li>
+                <li><strong>X-Ray</strong> &mdash; Distributed tracing</li>
+                <li><strong>SNS</strong> &mdash; Alert notifications (email, SMS)</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>DevOps &amp; CI/CD</h4>
+            <ul>
+                <li><strong>ECR</strong> &mdash; Docker image registry</li>
+                <li><strong>CodePipeline</strong> &mdash; Automated deployment pipeline</li>
+                <li><strong>CloudFormation</strong> &mdash; Infrastructure as Code</li>
+                <li><strong>Systems Manager</strong> &mdash; Parameter store for configs</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 9. DATA FLOW ==================== -->
+<section id="dataflow">
+    <h2>9. Data Flow</h2>
+
+    <h3>User Authentication Flow</h3>
+    <div class="diagram">
+        <pre>
+  Browser                  Flask App              Database           Keyring
+     |                        |                      |                  |
+     |  POST /login           |                      |                  |
+     |  {user, pass}          |                      |                  |
+     |----------------------->|                      |                  |
+     |                        |  SELECT user         |                  |
+     |                        |  WHERE username=?    |                  |
+     |                        |--------------------->|                  |
+     |                        |  User record         |                  |
+     |                        |<---------------------|                  |
+     |                        |                      |                  |
+     |                        |  bcrypt.verify(pass,  |                  |
+     |                        |    password_hash)    |                  |
+     |                        |                      |                  |
+     |  Set-Cookie: session   |                      |                  |
+     |  302 /dashboard        |                      |                  |
+     |<-----------------------|                      |                  |
+     |                        |  INSERT AuditLog     |                  |
+     |                        |  (login event)       |                  |
+     |                        |--------------------->|                  |
+        </pre>
+    </div>
+
+    <h3>Task Creation &amp; Execution Flow</h3>
+    <div class="diagram">
+        <pre>
+  Browser              Flask App           Database         Scheduler        Nova Act
+     |                    |                    |                |                |
+     |  POST /tasks/new   |                    |                |                |
+     |  {name, url,       |                    |                |                |
+     |   instructions,    |                    |                |                |
+     |   schedule_time}   |                    |                |                |
+     |------------------->|                    |                |                |
+     |                    |  INSERT Task       |                |                |
+     |                    |------------------->|                |                |
+     |                    |  task_id           |                |                |
+     |                    |<-------------------|                |                |
+     |  302 /tasks        |                    |                |                |
+     |<-------------------|                    |                |                |
+     |                    |                    |                |                |
+     |                    |     (At scheduled_time)             |                |
+     |                    |                    |  Fetch task    |                |
+     |                    |                    |<---------------|                |
+     |                    |                    |  Task data     |                |
+     |                    |                    |--------------->|                |
+     |                    |                    |                |                |
+     |                    |                    |                |  Resolve       |
+     |                    |                    |                |  credentials   |
+     |                    |                    |                |  from Keyring  |
+     |                    |                    |                |                |
+     |                    |                    |                |  Execute       |
+     |                    |                    |                |  automation    |
+     |                    |                    |                |--------------->|
+     |                    |                    |                |  Navigate,     |
+     |                    |                    |                |  click, type,  |
+     |                    |                    |                |  download      |
+     |                    |                    |                |<---------------|
+     |                    |                    |                |                |
+     |                    |                    | INSERT         |                |
+     |                    |                    | Execution      |                |
+     |                    |                    | (result)       |                |
+     |                    |                    |<---------------|                |
+        </pre>
+    </div>
+
+    <h3>Credential Security Data Flow</h3>
+    <div class="diagram">
+        <pre>
+  +-------------------------------------------------------------------+
+  |  CREDENTIAL STORAGE (Write Path)                                  |
+  |                                                                   |
+  |  User Form  ----> Flask Route ----> credential_manager            |
+  |  {username,                          |           |                |
+  |   password,                     Metadata      Password            |
+  |   description}                      |           |                |
+  |                                     v           v                |
+  |                               Database      Keyring              |
+  |                              (name, desc,  (encrypted            |
+  |                               url, dates)   password)            |
+  +-------------------------------------------------------------------+
+
+  +-------------------------------------------------------------------+
+  |  CREDENTIAL USAGE (Read Path)                                     |
+  |                                                                   |
+  |  Task Instructions:                                               |
+  |  "Login with {{credential:5:username}} / {{credential:5:password}}"|
+  |                     |                            |                |
+  |                     v                            v                |
+  |              Read from DB                Read from Keyring        |
+  |              (metadata)                  (decrypted password)     |
+  |                     |                            |                |
+  |                     +----------+  +--------------+                |
+  |                                |  |                               |
+  |                                v  v                               |
+  |                    Resolved instruction:                          |
+  |                    "Login with admin / s3cur3P@ss"                |
+  |                    (NEVER logged or persisted)                    |
+  +-------------------------------------------------------------------+
+        </pre>
+    </div>
+</section>
+
+<!-- ==================== 10. DEPLOYMENT FLOW ==================== -->
+<section id="deployment">
+    <h2>10. Deployment Flow</h2>
+
+    <h3>CI/CD Pipeline</h3>
+    <div class="diagram">
+        <pre>
+  Developer              GitHub              CI/CD Pipeline           AWS
+     |                      |                      |                    |
+     |  git push            |                      |                    |
+     |--------------------->|                      |                    |
+     |                      |  Webhook trigger     |                    |
+     |                      |--------------------->|                    |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 1. Lint &      |          |
+     |                      |              |    Type Check  |          |
+     |                      |              +-------+--------+          |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 2. Run Tests   |          |
+     |                      |              |    (pytest)    |          |
+     |                      |              +-------+--------+          |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 3. Build Docker|          |
+     |                      |              |    Image       |          |
+     |                      |              +-------+--------+          |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 4. Push to ECR |          |
+     |                      |              +-------+--------+--------->|
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 5. Deploy to   |          |
+     |                      |              |    ECS Staging |--------->|
+     |                      |              +-------+--------+          |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |                      |              | 6. Integration |          |
+     |                      |              |    Tests       |          |
+     |                      |              +-------+--------+          |
+     |                      |                      |                    |
+     |                      |              +-------v--------+          |
+     |  Approval required   |              | 7. Deploy to   |          |
+     |<---------------------|              |    Production  |--------->|
+     |  Approve             |              +----------------+          |
+     |--------------------->|                                          |
+        </pre>
+    </div>
+
+    <h3>Deployment Environments</h3>
+    <table>
+        <tr><th>Environment</th><th>Purpose</th><th>Database</th><th>URL</th></tr>
+        <tr>
+            <td><span class="badge badge-blue">Development</span></td>
+            <td>Local development &amp; testing</td>
+            <td>SQLite (local file)</td>
+            <td>http://localhost:5000</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-orange">Staging</span></td>
+            <td>Pre-production validation</td>
+            <td>RDS PostgreSQL (staging)</td>
+            <td>https://staging.automateportal.com</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">Production</span></td>
+            <td>Live customer-facing</td>
+            <td>RDS PostgreSQL (Multi-AZ)</td>
+            <td>https://app.automateportal.com</td>
+        </tr>
+    </table>
+
+    <h3>Deployment Commands</h3>
+    <pre><code># Option A: Elastic Beanstalk Deployment
+eb init automateportal --platform python-3.9 --region us-east-1
+eb create production --instance-type t3.small
+eb deploy production
+
+# Option B: ECS/Fargate Deployment
+aws ecr get-login-password | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.REGION.amazonaws.com
+docker build -t automateportal .
+docker tag automateportal:latest ACCOUNT.dkr.ecr.REGION.amazonaws.com/automateportal:latest
+docker push ACCOUNT.dkr.ecr.REGION.amazonaws.com/automateportal:latest
+aws ecs update-service --cluster prod --service web --force-new-deployment
+
+# Option C: CloudFormation Full Stack
+aws cloudformation deploy \
+  --template-file cloudformation/infrastructure.yaml \
+  --stack-name automateportal-prod \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides Environment=production</code></pre>
+
+    <h3>Rollback Strategy</h3>
+    <div class="callout-warning callout">
+        <strong>Blue-Green Deployment:</strong> ECS maintains the previous task definition. Rollback is instant via <code>aws ecs update-service --task-definition previous-version</code>. RDS automated backups enable point-in-time database recovery within 35 days.
+    </div>
+</section>
+
+<!-- ==================== 11. SAAS & MONETIZATION ==================== -->
+<section id="saas">
+    <h2>11. SaaS &amp; Monetization Strategy</h2>
+
+    <h3>Subscription Tiers</h3>
+    <table>
+        <tr>
+            <th>Feature</th>
+            <th><span class="badge badge-blue">Starter ($29/mo)</span></th>
+            <th><span class="badge badge-purple">Professional ($79/mo)</span></th>
+            <th><span class="badge badge-orange">Enterprise ($199/mo)</span></th>
+        </tr>
+        <tr><td>Automated Tasks</td><td>5</td><td>25</td><td>Unlimited</td></tr>
+        <tr><td>Task Executions / month</td><td>100</td><td>1,000</td><td>10,000</td></tr>
+        <tr><td>Stored Credentials</td><td>3</td><td>15</td><td>Unlimited</td></tr>
+        <tr><td>Users</td><td>1</td><td>5</td><td>25</td></tr>
+        <tr><td>Execution History</td><td>7 days</td><td>30 days</td><td>90 days</td></tr>
+        <tr><td>Scheduling</td><td>Daily only</td><td>Any frequency</td><td>Any + Cron</td></tr>
+        <tr><td>Email Notifications</td><td>-</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>API Access</td><td>-</td><td>-</td><td>Yes</td></tr>
+        <tr><td>Priority Support</td><td>-</td><td>-</td><td>Yes</td></tr>
+        <tr><td>Custom Integrations</td><td>-</td><td>-</td><td>Yes</td></tr>
+        <tr><td>SSO / SAML</td><td>-</td><td>-</td><td>Yes</td></tr>
+    </table>
+
+    <h3>Revenue Model</h3>
+    <div class="grid-3">
+        <div class="card">
+            <h4>Recurring Revenue</h4>
+            <p>Monthly/annual subscriptions. Annual plans at 20% discount to improve retention and cash flow.</p>
+        </div>
+        <div class="card">
+            <h4>Usage-Based Add-ons</h4>
+            <p>Extra executions at $0.05/each beyond plan limits. Premium automation engines (Selenium Grid) as add-on.</p>
+        </div>
+        <div class="card">
+            <h4>Professional Services</h4>
+            <p>Custom automation development ($150/hr). Onboarding &amp; training packages ($500-2000).</p>
+        </div>
+    </div>
+
+    <h3>Multi-Tenancy Architecture</h3>
+    <div class="diagram">
+        <pre>
+  +-------------------------------------------------------------------+
+  |                    MULTI-TENANT SaaS LAYER                        |
+  |                                                                   |
+  |  Tenant A (Acme Corp)     Tenant B (Beta Inc)    Tenant C (...)  |
+  |  +-------------------+   +-------------------+   +----------+    |
+  |  | Users: 5          |   | Users: 2          |   | ...      |    |
+  |  | Tasks: 20         |   | Tasks: 5          |   |          |    |
+  |  | Plan: Professional|   | Plan: Starter     |   |          |    |
+  |  +-------------------+   +-------------------+   +----------+    |
+  |           |                        |                              |
+  |           +----------+-------------+                              |
+  |                      |                                            |
+  |              +-------v-------+                                    |
+  |              | Shared DB     |  Row-Level Security                |
+  |              | tenant_id FK  |  Every query filtered by tenant   |
+  |              | on all tables |                                    |
+  |              +---------------+                                    |
+  +-------------------------------------------------------------------+
+        </pre>
+    </div>
+
+    <h3>Payment Integration</h3>
+    <div class="callout">
+        <strong>Stripe Integration:</strong> Use Stripe Billing for subscription management, usage metering, invoicing, and payment processing. Stripe handles PCI compliance, tax calculations, and provides a customer portal for self-service plan changes.
+    </div>
+
+    <h3>Go-to-Market Checklist</h3>
+    <ol>
+        <li>Add <code>tenant_id</code> column to all database tables</li>
+        <li>Implement Stripe subscription billing</li>
+        <li>Build plan enforcement middleware (check limits per request)</li>
+        <li>Add landing page with pricing</li>
+        <li>Implement self-service signup flow</li>
+        <li>Add usage metering and billing dashboard</li>
+        <li>Set up transactional emails (welcome, invoice, alerts)</li>
+        <li>Create onboarding wizard for new tenants</li>
+        <li>Add Terms of Service and Privacy Policy pages</li>
+        <li>Implement account deletion / data export (GDPR)</li>
+    </ol>
+</section>
+
+<!-- ==================== 12. LESSONS LEARNED ==================== -->
+<section id="lessons">
+    <h2>12. Lessons Learned</h2>
+
+    <h3>Architecture &amp; Design</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>Start Monolithic, Split Later</h4>
+            <p>Beginning with a single Flask app allowed rapid iteration. The clear module boundaries (auth, credentials, tasks, scheduler) make future microservice extraction straightforward without premature complexity.</p>
+        </div>
+        <div class="card">
+            <h4>ORM Abstraction Pays Off</h4>
+            <p>SQLAlchemy's database-agnostic design means migrating from SQLite (development) to PostgreSQL (production) requires only a connection string change &mdash; no query rewrites.</p>
+        </div>
+        <div class="card">
+            <h4>Server-Side Rendering is Underrated</h4>
+            <p>Jinja2 templates with Tailwind CSS deliver fast, responsive pages without a JavaScript build pipeline. For CRUD-heavy admin panels, SSR is simpler and more maintainable than a full SPA.</p>
+        </div>
+        <div class="card">
+            <h4>Credential Isolation is Non-Negotiable</h4>
+            <p>Storing passwords in the OS keyring (separate from the database) provides defense-in-depth. A database breach does not expose customer credentials &mdash; this is a strong selling point for enterprise customers.</p>
+        </div>
+    </div>
+
+    <h3>Development &amp; Operations</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>V1 to V2 Migration Strategy</h4>
+            <p>Building a dedicated migration tool (<code>migrate_v1_to_v2.py</code>) with backup, validation, and rollback proved essential. Never assume a clean migration &mdash; always provide a way back.</p>
+        </div>
+        <div class="card">
+            <h4>Browser Automation is Fragile</h4>
+            <p>Websites change layouts, add CAPTCHAs, and update authentication flows. Retry logic, multi-step instruction splitting, and error recovery are essential. Nova Act's AI-based approach handles layout changes better than traditional Selenium selectors.</p>
+        </div>
+        <div class="card">
+            <h4>Environment Variables for Everything</h4>
+            <p>API keys, database URLs, and secrets via environment variables (not config files) prevents accidental commits of sensitive data and enables 12-factor app deployment.</p>
+        </div>
+        <div class="card">
+            <h4>Audit Logging from Day One</h4>
+            <p>Adding the <code>AuditLog</code> model early means every action is traceable. This is critical for enterprise customers, compliance requirements, and debugging production issues.</p>
+        </div>
+    </div>
+
+    <h3>Security Lessons</h3>
+    <div class="grid-2">
+        <div class="card" style="border-left: 4px solid var(--danger);">
+            <h4>Never Log Credentials</h4>
+            <p>Credential resolution happens at the last moment before execution. Resolved values are never written to logs, database, or any persistent storage. This required careful design of the logging pipeline.</p>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--danger);">
+            <h4>Default Passwords Must Be Changed</h4>
+            <p>The default <code>admin/admin123</code> account is a convenience for development. Production deployments must enforce password change on first login &mdash; this is a SaaS launch requirement.</p>
+        </div>
+    </div>
+
+    <h3>Scaling Considerations</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>Scheduler Needs Isolation</h4>
+            <p>Running the scheduler in the same process as the web server works for development but causes issues under load. The <code>standalone_scheduler.py</code> separation was a key learning &mdash; in production, use a separate ECS task or worker.</p>
+        </div>
+        <div class="card">
+            <h4>SQLite to PostgreSQL Early</h4>
+            <p>SQLite's single-writer limitation becomes a bottleneck quickly with concurrent users. Plan the PostgreSQL migration before launch, not after &mdash; the SQLAlchemy ORM makes this painless.</p>
+        </div>
+    </div>
+
+    <h3>Business &amp; Product Lessons</h3>
+    <div class="grid-2">
+        <div class="card" style="border-left: 4px solid var(--success);">
+            <h4>Multi-Tenancy from the Start</h4>
+            <p>Adding <code>tenant_id</code> to all models after launch is painful and risky. For SaaS, design the data model with multi-tenancy from day one, even if you only have one customer.</p>
+        </div>
+        <div class="card" style="border-left: 4px solid var(--success);">
+            <h4>Usage Limits Drive Upgrades</h4>
+            <p>Free/starter plan limits (5 tasks, 100 executions) naturally drive upgrades as users see value. Generous limits attract users; clear upgrade paths convert them to paid customers.</p>
+        </div>
+    </div>
+
+    <div class="callout-success callout">
+        <strong>Key Takeaway:</strong> The combination of AI-powered browser automation (Nova Act), enterprise-grade security (keyring credential isolation), and a clean multi-tenant architecture positions AutomatePortal as a differentiated product in the RPA/automation market. The technical foundation supports scaling from a single user to thousands of enterprise customers with minimal architectural changes.
+    </div>
+</section>
+
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+    <p><strong>AutomatePortal</strong> &mdash; Technical Design Document v2.0</p>
+    <p>Confidential &bull; For Internal Use &bull; March 2026</p>
+    <p>&copy; 2026 AutomatePortal. All rights reserved.</p>
+</div>
+
+</body>
+</html>
