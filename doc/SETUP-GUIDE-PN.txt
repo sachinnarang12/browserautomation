@@ -1,0 +1,178 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║            AutomatePortal - Setup Guide for PN                   ║
+║            AI-Powered Browser Automation Platform                ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  License Key:  AP-PRO-20270310-DED0-4D2BC2D0
+  Plan:         Professional (25 tasks, 15 credentials, 5 users)
+  Valid Until:  March 10, 2027
+
+══════════════════════════════════════════════════════════════════
+
+  BEFORE YOU START  (you only need to do this once)
+  ─────────────────────────────────────────────────
+
+  You need ONE thing installed on the computer:
+
+    ✅  Python 3.9 or newer
+
+  To check, open a Command Prompt and type:
+
+    python --version
+
+  If you see "Python 3.9" or higher → you're good, skip to STEP 1.
+  If not → install it:
+
+    1. Go to  https://www.python.org/downloads/
+    2. Download "Python 3.11" (or latest)
+    3. Run the installer
+    4. ⚠️  CHECK THE BOX:  "Add Python to PATH"   ← VERY IMPORTANT
+    5. Click "Install Now"
+
+
+══════════════════════════════════════════════════════════════════
+
+  STEP 1 — EXTRACT THE ZIP
+  ─────────────────────────
+
+  1. Right-click the file:  AutomatePortal-PN.zip
+  2. Click "Extract All..."
+  3. Choose a location, for example:
+       C:\AutomatePortal
+  4. Click "Extract"
+
+
+══════════════════════════════════════════════════════════════════
+
+  STEP 2 — RUN THE INSTALLER
+  ───────────────────────────
+
+  1. Open the folder you just extracted
+  2. Double-click:  install.bat
+  3. A black window will appear — let it run
+  4. It will:
+       • Create a virtual environment
+       • Install all software dependencies
+       • Set up the database
+       • Create a launcher shortcut
+  5. When it says "INSTALLATION COMPLETE", press any key
+
+
+══════════════════════════════════════════════════════════════════
+
+  STEP 3 — START THE APPLICATION
+  ──────────────────────────────
+
+  1. Double-click:  Start AutomatePortal.bat
+  2. Your browser will automatically open to the setup wizard
+  3. If it doesn't, manually go to:  http://localhost:5000
+
+
+══════════════════════════════════════════════════════════════════
+
+  STEP 4 — COMPLETE THE SETUP WIZARD  (first time only)
+  ─────────────────────────────────────────────────────
+
+  The wizard has 3 quick steps:
+
+  Step 1 of 3 — SET YOUR PASSWORD
+    • Type a new password (8+ characters)
+    • Type it again to confirm
+    • Click "Next"
+
+  Step 2 of 3 — ENTER API KEY
+    • Your Nova Act API key has been pre-configured
+    • If prompted, it is already in your .env file
+    • Click "Next"
+
+  Step 3 of 3 — YOUR PREFERENCES
+    • Company Name:  PN   (or your full company name)
+    • Download Directory:  leave as default or change
+    • Admin Email:  your email address
+    • Click "Complete Setup"
+
+
+══════════════════════════════════════════════════════════════════
+
+  STEP 5 — ACTIVATE YOUR LICENSE
+  ──────────────────────────────
+
+  1. Log in with:
+       Username:  admin
+       Password:  (the one you just set in Step 4)
+
+  2. Click "License" in the top menu bar
+
+  3. Enter your license key:
+
+       AP-PRO-20270310-DED0-4D2BC2D0
+
+  4. Company Name:  PN
+
+  5. Click "Activate License"
+
+  6. You should see: "License activated! Professional - 365 days remaining"
+
+
+══════════════════════════════════════════════════════════════════
+
+  DAILY USE
+  ─────────
+
+  Starting:   Double-click "Start AutomatePortal.bat"
+  Stopping:   Press Ctrl+C in the black window, or just close it
+  Dashboard:  Open browser to http://localhost:5000
+
+  Creating your first automation task:
+    1. Click "Tasks" in the menu
+    2. Click "Add Task"
+    3. Fill in the URL, instructions, and schedule
+    4. Save — it will run automatically at the scheduled time
+
+
+══════════════════════════════════════════════════════════════════
+
+  YOUR PLAN LIMITS (Professional)
+  ────────────────────────────────
+
+    Tasks:              up to 25
+    Saved Credentials:  up to 15
+    Users:              up to 5
+    Executions/month:   up to 1,000
+
+
+══════════════════════════════════════════════════════════════════
+
+  TROUBLESHOOTING
+  ────────────────
+
+  Problem                          Solution
+  ───────────────────────────────   ──────────────────────────────
+  "Python is not recognized"        Reinstall Python, check
+                                    "Add to PATH"
+
+  Port 5000 already in use          Close other apps on port 5000
+
+  Tasks not executing               Check API key in Settings
+
+  Browser doesn't open              Go to http://localhost:5000
+                                    manually
+
+  Forgot password                   Delete "users.json" in the
+                                    app folder, restart app
+                                    (resets to admin/admin123)
+
+
+══════════════════════════════════════════════════════════════════
+
+  SUPPORT
+  ───────
+
+  For help, contact your AutomatePortal administrator.
+
+
+══════════════════════════════════════════════════════════════════
+  AutomatePortal v2.0  •  Licensed to PN  •  2026
+══════════════════════════════════════════════════════════════════
