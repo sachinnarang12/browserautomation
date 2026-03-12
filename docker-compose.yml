@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  portal:
+    build: .
+    container_name: automateportal
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env                          # Create from .env.example
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      # Persist data across container restarts (secrets, DB, config)
+      - portal-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  portal-data:

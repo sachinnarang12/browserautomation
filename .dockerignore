@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+venv/
+env/
+.eggs/
+
+# Data & secrets (never bake into image)
+.env
+data/
+*.db
+*.log
+users.json
+credentials_index.json
+agent_config.json
+
+# IDE
+.vscode/
+.idea/
+.kiro/
+
+# Docs & misc
+*.md
+*.pem
+*.key
+nova_downloads/

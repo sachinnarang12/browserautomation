@@ -890,4 +890,5 @@ if __name__ == '__main__':
     print("  ╚══════════════════════════════════════════════════════╝")
     print()
     
-    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
+    debug = os.environ.get('FLASK_ENV', 'production') == 'development'
+    app.run(debug=debug, host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
