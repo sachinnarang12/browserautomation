@@ -31,10 +31,12 @@ COPY requirements_v2.txt ./
 RUN pip install --no-cache-dir -r requirements_v2.txt
 
 # Pre-install Playwright Chromium + its OS dependencies so tasks start instantly
-# Uses PLAYWRIGHT_BROWSERS_PATH so all users (including portal) can access it
+# Install deps first (needs root), then browser to shared path writable by portal user
+RUN playwright install-deps chromium
+
 RUN mkdir -p /opt/pw-browsers && \
-    playwright install --with-deps chromium && \
-    chmod -R 755 /opt/pw-browsers
+    playwright install chromium && \
+    chmod -R 777 /opt/pw-browsers
 
 # Copy application code
 COPY . .
