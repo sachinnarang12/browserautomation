@@ -13,13 +13,21 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-# License signing secret — MUST be set via environment variable.
+# License signing secret — read from env var, or auto-generate and persist.
 _LICENSE_SECRET = os.environ.get('AUTOMATEPORTAL_LICENSE_SECRET')
 if not _LICENSE_SECRET:
-    raise RuntimeError(
-        "AUTOMATEPORTAL_LICENSE_SECRET environment variable is not set. "
-        "Set it before starting the application (e.g. in your .env file)."
-    )
+    _secret_file = Path('data/.license_secret')
+    if _secret_file.exists():
+        _LICENSE_SECRET = _secret_file.read_text().strip()
+    else:
+        import secrets as _secrets
+        _LICENSE_SECRET = _secrets.token_hex(32)
+        _secret_file.parent.mkdir(parents=True, exist_ok=True)
+        _secret_file.write_text(_LICENSE_SECRET)
+        try:
+            os.chmod(_secret_file, 0o600)
+        except OSError:
+            pass
 
 LICENSE_FILE = Path('data/license.json')
 
