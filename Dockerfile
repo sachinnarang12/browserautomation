@@ -49,5 +49,8 @@ EXPOSE 5000 6080
 # Install gunicorn at build time
 RUN pip install --no-cache-dir gunicorn
 
-# Use supervisor to manage all processes (Xvfb, VNC, noVNC, gunicorn)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Entrypoint fixes volume permissions then starts supervisord
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
