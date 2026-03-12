@@ -4,7 +4,8 @@ FROM python:3.11-slim
 # Force keyring to use a null backend (our app uses its own Fernet vault)
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
+    PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 
 WORKDIR /app
 
@@ -30,7 +31,10 @@ COPY requirements_v2.txt ./
 RUN pip install --no-cache-dir -r requirements_v2.txt
 
 # Pre-install Playwright Chromium + its OS dependencies so tasks start instantly
-RUN playwright install --with-deps chromium
+# Uses PLAYWRIGHT_BROWSERS_PATH so all users (including portal) can access it
+RUN mkdir -p /opt/pw-browsers && \
+    playwright install --with-deps chromium && \
+    chmod -R 755 /opt/pw-browsers
 
 # Copy application code
 COPY . .
