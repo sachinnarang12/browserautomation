@@ -6,9 +6,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system deps needed by cryptography / keyring
+# Install system deps needed by cryptography / keyring / noVNC / browser
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libffi-dev && \
+    apt-get install -y --no-install-recommends \
+        gcc libffi-dev \
+        xvfb x11vnc xterm \
+        novnc websockify \
+        procps net-tools \
+        supervisor && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies (cached layer unless requirements change)
@@ -21,16 +26,19 @@ COPY . .
 # Create data directory for runtime secrets (flask key, credential vault, etc.)
 RUN mkdir -p /app/data
 
+# Copy supervisor config
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Run as non-root user
-RUN groupadd -r portal && useradd -r -g portal -d /app portal && \
-    chown -R portal:portal /app
-USER portal
+RUN groupadd -r portal && useradd -r -g portal -d /app -s /bin/bash portal && \
+    chown -R portal:portal /app && \
+    mkdir -p /home/portal && chown portal:portal /home/portal
 
-EXPOSE 5000
+# Expose ports: 5000=webapp, 6080=noVNC
+EXPOSE 5000 6080
 
-# Use a proper WSGI server for production; fall back to Flask dev server
 # Install gunicorn at build time
 RUN pip install --no-cache-dir gunicorn
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", \
-     "--timeout", "120", "agent_dashboard_v2:app"]
+# Use supervisor to manage all processes (Xvfb, VNC, noVNC, gunicorn)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

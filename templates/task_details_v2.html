@@ -27,6 +27,13 @@
                     {% if task.status == 'running' %}disabled{% endif %}>
                 Run Now
             </button>
+            <button onclick="openLiveMonitor()"
+                    class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
+                <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Watch Live
+            </button>
             {% if task.status == 'running' or task.status == 'failed' %}
             <button onclick="resetTask('{{ task.id }}')"
                     class="inline-flex items-center rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400">
@@ -143,6 +150,27 @@
         </div>
     </div>
 
+    <!-- Live Browser Monitor (hidden by default) -->
+    <div id="live-monitor" class="hidden mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <h3 class="text-base font-semibold leading-6 text-gray-900">
+                <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                Live Browser View
+            </h3>
+            <button onclick="closeLiveMonitor()"
+                    class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
+                Close
+            </button>
+        </div>
+        <div class="border-t border-gray-200">
+            <iframe id="novnc-frame" style="width:100%; height:500px; border:none;"
+                    allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+        <div class="px-4 py-3 bg-gray-50 text-xs text-gray-500">
+            This shows the browser running on the server in real-time. You can watch automation tasks as they execute.
+        </div>
+    </div>
+
     <!-- Run status banner (hidden by default) -->
     <div id="run-status" class="hidden mt-6 rounded-md p-4">
         <div class="flex">
@@ -155,6 +183,23 @@
 </div>
 
 <script>
+function openLiveMonitor() {
+    const monitor = document.getElementById('live-monitor');
+    const frame = document.getElementById('novnc-frame');
+    // noVNC runs on the same host, port 6080
+    const host = window.location.hostname;
+    frame.src = 'http://' + host + ':6080/vnc.html?autoconnect=true&resize=scale';
+    monitor.classList.remove('hidden');
+    monitor.scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeLiveMonitor() {
+    const monitor = document.getElementById('live-monitor');
+    const frame = document.getElementById('novnc-frame');
+    frame.src = '';
+    monitor.classList.add('hidden');
+}
+
 let pollInterval = null;
 let pollStartTime = null;
 const POLL_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes

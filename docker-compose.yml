@@ -6,6 +6,7 @@ services:
     container_name: automateportal
     ports:
       - "5000:5000"
+      - "6080:6080"       # noVNC - live browser monitoring
     env_file:
       - .env                          # Create from .env.example
     environment:

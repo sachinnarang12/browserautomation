@@ -20,23 +20,12 @@ def _init_keyring():
     """Initialize keyring with a working backend.
 
     On headless Linux (no D-Bus / DISPLAY), the default SecretService backend
-    won't work.  Instead of falling back to PlaintextKeyring we use
-    ``cryptography.Fernet`` with a key derived from a master password so that
-    credentials are always encrypted at rest.
+    won't work.  We always use our own Fernet-encrypted file backend on Linux
+    so that credentials are encrypted at rest without needing OS keychain
+    services or the keyrings.alt package.
     """
-    needs_fallback = (
-        sys.platform == 'linux'
-        and not os.environ.get('DBUS_SESSION_BUS_ADDRESS')
-        and not os.environ.get('DISPLAY')
-    )
-
-    if needs_fallback:
-        try:
-            from keyrings.alt.file import EncryptedKeyring
-            keyring.set_keyring(EncryptedKeyring())
-        except (ImportError, Exception):
-            # EncryptedKeyring may not be available; use our own Fernet backend
-            keyring.set_keyring(_FernetFileKeyring())
+    if sys.platform == 'linux':
+        keyring.set_keyring(_FernetFileKeyring())
 
 
 class _FernetFileKeyring(keyring.backend.KeyringBackend):

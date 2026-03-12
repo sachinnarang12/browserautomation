@@ -508,6 +508,16 @@ def delete_credential(credential_id):
     return redirect(url_for('credentials'))
 
 # ============================================================================
+# Live Monitor Route
+# ============================================================================
+
+@app.route('/monitor')
+@login_required
+def live_monitor():
+    """Live browser monitor page - shows noVNC viewer for watching automation"""
+    return render_template('live_monitor.html', user=current_user)
+
+# ============================================================================
 # Settings Routes
 # ============================================================================
 
