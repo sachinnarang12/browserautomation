@@ -29,6 +29,9 @@ RUN mkdir -p /opt/novnc/utils/websockify && \
 COPY requirements_v2.txt ./
 RUN pip install --no-cache-dir -r requirements_v2.txt
 
+# Pre-install Playwright Chromium + its OS dependencies so tasks start instantly
+RUN playwright install --with-deps chromium
+
 # Copy application code
 COPY . .
 
