@@ -41,6 +41,9 @@ users.json
 agent_config.json
 *.log
 portal_agent.log
+data/.flask_secret
+data/.master_key
+data/credential_vault.enc
 
 # Downloaded Files
 nova_downloads/

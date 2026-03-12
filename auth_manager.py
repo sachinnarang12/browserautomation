@@ -72,19 +72,24 @@ class AuthManager:
             json.dump(data, f, indent=2)
     
     def _create_default_admin(self):
-        """Create default admin user"""
+        """Create default admin user with a random temporary password.
+
+        The setup wizard (first-run) forces the user to choose a real password
+        before they can log in, so this temporary password is never usable in
+        practice.
+        """
+        temp_password = secrets.token_urlsafe(24)
         admin_id = secrets.token_hex(8)
         admin = User(
             id=admin_id,
             username='admin',
-            password_hash=generate_password_hash('admin123'),
+            password_hash=generate_password_hash(temp_password),
             email='admin@localhost',
             is_admin=True
         )
         self.users[admin_id] = admin
         self._save_users()
-        print("✅ Default admin user created: username='admin', password='admin123'")
-        print("⚠️  Please change the default password immediately!")
+        print("Default admin user created — password must be set via setup wizard.")
     
     def create_user(self, username, password, email=None, is_admin=False):
         """Create a new user"""

@@ -13,9 +13,13 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 
-# This secret would be kept on your license server in production.
-# For offline validation we use HMAC signatures.
-_LICENSE_SECRET = os.environ.get('AUTOMATEPORTAL_LICENSE_SECRET', 'AP-2026-SEED-KEY')
+# License signing secret — MUST be set via environment variable.
+_LICENSE_SECRET = os.environ.get('AUTOMATEPORTAL_LICENSE_SECRET')
+if not _LICENSE_SECRET:
+    raise RuntimeError(
+        "AUTOMATEPORTAL_LICENSE_SECRET environment variable is not set. "
+        "Set it before starting the application (e.g. in your .env file)."
+    )
 
 LICENSE_FILE = Path('data/license.json')
 

@@ -162,25 +162,24 @@ class Database:
             
             if not admin:
                 from werkzeug.security import generate_password_hash
-                
+                import secrets as _secrets
+
+                # Use a random temporary password — the setup wizard forces
+                # the user to set a real password before first login.
+                temp_password = _secrets.token_urlsafe(24)
                 admin = User(
                     username='admin',
-                    password_hash=generate_password_hash('admin123'),
+                    password_hash=generate_password_hash(temp_password),
                     email='admin@localhost',
                     is_admin=True
                 )
                 session.add(admin)
                 session.commit()
-                
-                print("✅ Default admin user created")
-                print("   Username: admin")
-                print("   Password: admin123")
-                print("   ⚠️  Please change the password immediately!")
+
+                print("Default admin user created — password must be set via setup wizard.")
             
-            # Add default system config (API keys loaded from environment)
-            import os
+            # Add default system config (API keys are environment-only, never stored in DB)
             configs = [
-                ('nova_act_api_key', os.environ.get('NOVA_ACT_API_KEY', ''), 'Nova Act API Key (set NOVA_ACT_API_KEY env var)'),
                 ('scheduler_enabled', 'true', 'Enable automatic task scheduling'),
                 ('max_concurrent_tasks', '5', 'Maximum concurrent task executions'),
                 ('log_retention_days', '30', 'Days to retain execution logs'),

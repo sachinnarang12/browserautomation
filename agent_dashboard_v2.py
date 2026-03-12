@@ -19,7 +19,31 @@ from database import Database, Task as DBTask, Credential as DBCredential, Execu
 from license_manager import get_current_license, activate_license, validate_license_key, check_limit, TIER_LIMITS
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(32).hex())
+
+def _get_flask_secret():
+    """Return a stable Flask secret key.
+
+    Priority: FLASK_SECRET_KEY env var > persisted file > generate & persist.
+    """
+    env_key = os.environ.get('FLASK_SECRET_KEY')
+    if env_key:
+        return env_key
+
+    secret_file = Path('data/.flask_secret')
+    if secret_file.exists():
+        return secret_file.read_text().strip()
+
+    # First run — generate and save
+    key = os.urandom(32).hex()
+    secret_file.parent.mkdir(parents=True, exist_ok=True)
+    secret_file.write_text(key)
+    try:
+        os.chmod(secret_file, 0o600)
+    except OSError:
+        pass
+    return key
+
+app.secret_key = _get_flask_secret()
 # Ensure error handlers work even in debug mode (otherwise Flask
 # propagates exceptions to Werkzeug's HTML debugger, breaking JSON APIs)
 app.config['PROPAGATE_EXCEPTIONS'] = False
@@ -85,11 +109,9 @@ def setup_wizard():
             admin_user.password_hash = generate_password_hash(new_password)
             auth_manager._save_users()
 
-        # Save API key to environment / config
+        # Set API key in current process environment only (not persisted to disk)
         if api_key:
             os.environ['NOVA_ACT_API_KEY'] = api_key
-            # Also save to .env file for persistence
-            _update_env_file('NOVA_ACT_API_KEY', api_key)
 
         # Save settings to config
         config_file = Path('agent_config.json')
@@ -123,30 +145,6 @@ def _default_download_dir():
     downloads = home / 'Downloads'
     return str(downloads) if downloads.exists() else str(home)
 
-
-def _update_env_file(key, value):
-    """Update or add a key in the .env file"""
-    env_file = Path('.env')
-    lines = []
-    found = False
-
-    if env_file.exists():
-        with open(env_file, 'r') as f:
-            lines = f.readlines()
-
-    new_lines = []
-    for line in lines:
-        if line.strip().startswith(f'{key}='):
-            new_lines.append(f'{key}={value}\n')
-            found = True
-        else:
-            new_lines.append(line)
-
-    if not found:
-        new_lines.append(f'{key}={value}\n')
-
-    with open(env_file, 'w') as f:
-        f.writelines(new_lines)
 
 
 @app.route('/license', methods=['GET', 'POST'])
