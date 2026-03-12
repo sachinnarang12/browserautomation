@@ -23,8 +23,22 @@ def _init_keyring():
     won't work.  We always use our own Fernet-encrypted file backend on Linux
     so that credentials are encrypted at rest without needing OS keychain
     services or the keyrings.alt package.
+
+    We also force our backend when the PYTHON_KEYRING_BACKEND env var is set
+    to the null backend (e.g. inside Docker), so credentials are still
+    encrypted rather than silently discarded.
     """
-    if sys.platform == 'linux':
+    try:
+        if sys.platform == 'linux':
+            keyring.set_keyring(_FernetFileKeyring())
+        else:
+            # On non-Linux, test that the default backend works
+            current = keyring.get_keyring()
+            if 'null' in type(current).__module__.lower() or \
+               'fail' in type(current).__name__.lower():
+                keyring.set_keyring(_FernetFileKeyring())
+    except Exception:
+        # Last resort: always use our encrypted file backend
         keyring.set_keyring(_FernetFileKeyring())
 
 

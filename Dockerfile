@@ -1,20 +1,29 @@
 FROM python:3.11-slim
 
 # Prevent Python from writing .pyc files and enable unbuffered stdout/stderr
+# Force keyring to use a null backend (our app uses its own Fernet vault)
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 
 WORKDIR /app
 
-# Install system deps needed by cryptography / keyring / noVNC / browser
+# Install system deps needed by cryptography / VNC / browser display
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc libffi-dev \
         xvfb x11vnc xterm \
-        novnc websockify \
-        procps net-tools \
+        procps net-tools curl \
         supervisor && \
     rm -rf /var/lib/apt/lists/*
+
+# Install noVNC + websockify from source (Debian packages unreliable on slim)
+RUN mkdir -p /opt/novnc/utils/websockify && \
+    curl -sL https://github.com/novnc/noVNC/archive/refs/tags/v1.4.0.tar.gz \
+        | tar xz --strip-components=1 -C /opt/novnc && \
+    curl -sL https://github.com/novnc/websockify/archive/refs/tags/v0.11.0.tar.gz \
+        | tar xz --strip-components=1 -C /opt/novnc/utils/websockify && \
+    ln -s /opt/novnc/vnc.html /opt/novnc/index.html
 
 # Install Python dependencies (cached layer unless requirements change)
 COPY requirements_v2.txt ./
