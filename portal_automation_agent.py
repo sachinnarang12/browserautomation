@@ -85,6 +85,9 @@ class PortalAutomationAgent:
         # Download directory configuration (defaults to user's Downloads folder)
         self.download_dir = ""
 
+        # Track resolved credential values so they can be masked in logs
+        self._credential_values: set = set()
+
         self.load_config()
         
     def load_config(self):
@@ -211,7 +214,11 @@ class PortalAutomationAgent:
         return True
     
     def _resolve_credentials(self, text: str) -> str:
-        """Replace {{credential:ID:field}} placeholders with actual values"""
+        """Replace {{credential:ID:field}} placeholders with actual values.
+
+        Also populates ``self._credential_values`` so that resolved secrets
+        can be masked before they reach logs or stored results.
+        """
         pattern = r'\{\{credential:(\w+):(\w+)\}\}'
         matches = re.findall(pattern, text)
         if not matches:
@@ -220,9 +227,19 @@ class PortalAutomationAgent:
         for cred_id, field in matches:
             cred = cm.get_credential(cred_id)
             if cred and field in cred:
-                text = text.replace(f'{{{{credential:{cred_id}:{field}}}}}', cred[field])
+                value = cred[field]
+                text = text.replace(f'{{{{credential:{cred_id}:{field}}}}}', value)
+                # Track resolved values so we can mask them in logs
+                self._credential_values.add(value)
             else:
                 logger.warning(f"Could not resolve credential {cred_id}:{field}")
+        return text
+
+    def _mask_secrets(self, text: str) -> str:
+        """Replace any resolved credential values in *text* with '***'."""
+        for secret in self._credential_values:
+            if secret and secret in text:
+                text = text.replace(secret, '***')
         return text
 
     def _cleanup_stale_sessions(self, task_id: str):
@@ -348,7 +365,8 @@ class PortalAutomationAgent:
                 except Exception as dl_setup_err:
                     logger.warning(f"Could not set up download handler: {dl_setup_err}")
 
-            # Resolve credential placeholders
+            # Resolve credential placeholders (clear previous values first)
+            self._credential_values.clear()
             instructions = self._resolve_credentials(task.instructions)
 
             # Split into individual steps and execute each one
@@ -358,11 +376,12 @@ class PortalAutomationAgent:
             results = []
             for i, raw_step in enumerate(steps, 1):
                 step_text, wait_secs = self._extract_wait_seconds(raw_step)
-                logger.info(f"Task {task.name} - Step {i}/{len(steps)}: {step_text[:120]}")
+                logger.info(f"Task {task.name} - Step {i}/{len(steps)}: {self._mask_secrets(step_text[:120])}")
 
                 result = nova.act(step_text)
-                results.append(f"Step {i}: {result}")
-                logger.info(f"Task {task.name} - Step {i} result: {result}")
+                masked_result = self._mask_secrets(str(result))
+                results.append(f"Step {i}: {masked_result}")
+                logger.info(f"Task {task.name} - Step {i} result: {masked_result}")
 
                 # Honour explicit wait directives (e.g. "wait 1 minute")
                 if wait_secs > 0:
@@ -376,7 +395,7 @@ class PortalAutomationAgent:
             task.status = TaskStatus.COMPLETED
             if downloaded_files:
                 results.append(f"Downloads: {', '.join(downloaded_files)}")
-            task.result = '\n'.join(results)
+            task.result = self._mask_secrets('\n'.join(results))
             task.retry_count = 0
 
             logger.info(f"Task {task.name} completed successfully ({len(steps)} steps)")
@@ -384,11 +403,11 @@ class PortalAutomationAgent:
                 logger.info(f"Downloaded files: {downloaded_files}")
 
         except Exception as e:
-            logger.error(f"Task {task.name} failed: {e}")
+            logger.error(f"Task {task.name} failed: {self._mask_secrets(str(e))}")
 
             # Update task with failure
             task.status = TaskStatus.FAILED
-            task.error_message = str(e)
+            task.error_message = self._mask_secrets(str(e))
             task.retry_count += 1
 
             # Schedule retry if under max retries
