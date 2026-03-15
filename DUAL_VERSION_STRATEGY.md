@@ -9,7 +9,7 @@ on personal time using personal resources.  Two editions exist:
 |------------------|--------------------------------------|------------------------------------------|
 | Purpose          | Help employer's operations           | SaaS product sold on the market          |
 | License          | `LICENSE-EMPLOYER` (limited-use)     | `LICENSE` (proprietary / commercial)     |
-| Source code      | **Never shared** (bytecode only)     | Full source (your private repo)          |
+| Source code      | Shared (for employer customisation)  | Full source (your private repo)          |
 | Features today   | Everything EXCEPT licensing/billing  | Everything including licensing/billing   |
 | Future features  | Frozen at what exists today          | Gets all new features (multi-tenant, marketplace, etc.) |
 | Branding         | "AutomatePortal – Internal"          | "AutomatePortal"                         |
@@ -88,28 +88,27 @@ python editions/commercial/run.py
 
 ## Packaging Version A for Your Employer
 
-**CRITICAL: Never give your employer the source code.**
-
 ```bash
 python editions/employer/package_employer_edition.py --output-dir ./dist
 ```
 
 This produces:
-- `dist/AutomatePortal-Employer/` — bytecode-only directory
+- `dist/AutomatePortal-Employer/` — source code package
 - `dist/AutomatePortal-Employer.zip` — ready to hand over
 
 The package includes:
-- Compiled `.pyc` files (no `.py` source)
-- HTML templates (UI only)
+- Python source files (`.py`) so employer can refine per their needs
+- HTML templates (UI)
 - `LICENSE-EMPLOYER` (the limited-use license)
 - `start.py` launcher
+- `requirements.txt`
 
 The package does NOT include:
-- Source code
 - Commercial edition files
 - Your roadmap, SaaS guides, or strategy docs
 - License key generator
 - Product documentation
+- Your private licenses or strategy docs
 
 ---
 
@@ -123,7 +122,7 @@ The package does NOT include:
 - [ ] Keep records of your personal development (git history, timestamps)
 
 ### Ongoing Protection
-- [ ] Employer repo receives ONLY compiled bytecode packages
+- [ ] Employer receives source under `LICENSE-EMPLOYER` (limited-use, no resale)
 - [ ] Your private repo has full source + git history (proof of authorship)
 - [ ] Every source file has copyright header
 - [ ] Keep the `LICENSE` and `DUAL_VERSION_STRATEGY.md` out of employer packages

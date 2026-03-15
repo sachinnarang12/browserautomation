@@ -2,8 +2,8 @@
 """
 Package the Employer Edition (Version A) for delivery.
 
-This script creates a distributable archive that includes ONLY:
-  - Compiled Python bytecode (.pyc) — NOT source code
+This script creates a distributable archive that includes:
+  - Python source files (.py) so the employer can refine per their needs
   - Templates and static assets
   - The employer license
   - A pre-configured launcher
@@ -13,7 +13,6 @@ Usage:
 """
 
 import argparse
-import compileall
 import os
 import shutil
 import sys
@@ -21,14 +20,13 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
-# Files/dirs to INCLUDE in employer package (as .pyc, not .py)
+# Python source files to include
 CORE_MODULES = [
     "agent_dashboard_v2.py",
     "auth_manager.py",
     "credential_manager.py",
     "database.py",
     "portal_automation_agent.py",
-    "license_manager.py",
     "core/__init__.py",
     "core/edition.py",
 ]
@@ -49,9 +47,11 @@ NEVER_INCLUDE = {
     "LICENSE",               # full proprietary license (your eyes only)
     "COPYRIGHT_HEADER.py",
     "PRODUCT_ROADMAP_V2.md",
+    "DUAL_VERSION_STRATEGY.md",
     "doc/saas-product-guide.html",
     "doc/technical-design.html",
     "editions/commercial",
+    "license_manager.py",    # commercial-only licensing system
     ".env",
     ".env.example",
     "agent_config.json",
@@ -71,31 +71,18 @@ def package(output_dir: Path):
 
     print(f"Packaging Employer Edition to: {build_dir}")
 
-    # 1. Compile core modules to .pyc and copy bytecode only
-    pyc_dir = build_dir / "lib"
-    pyc_dir.mkdir()
+    # 1. Copy core Python source files
     for mod_path in CORE_MODULES:
         src = PROJECT_ROOT / mod_path
         if not src.exists():
             print(f"  SKIP (missing): {mod_path}")
             continue
 
-        # Compile
-        compileall.compile_file(str(src), force=True, quiet=1)
-
-        # Find the .pyc in __pycache__
-        cache_dir = src.parent / "__pycache__"
-        pyc_files = list(cache_dir.glob(f"{src.stem}.cpython-*.pyc"))
-        if not pyc_files:
-            print(f"  WARN: no .pyc found for {mod_path}")
-            continue
-
-        # Copy .pyc with clean name
-        dest_subdir = pyc_dir / str(Path(mod_path).parent)
+        dest_subdir = build_dir / str(Path(mod_path).parent)
         dest_subdir.mkdir(parents=True, exist_ok=True)
-        dest = dest_subdir / f"{src.stem}.pyc"
-        shutil.copy2(pyc_files[0], dest)
-        print(f"  Compiled: {mod_path} -> {dest.relative_to(build_dir)}")
+        dest = dest_subdir / src.name
+        shutil.copy2(src, dest)
+        print(f"  Copied: {mod_path}")
 
     # 2. Copy template directories as-is
     for dir_name in INCLUDE_DIRS:
@@ -119,7 +106,7 @@ def package(output_dir: Path):
         '"""AutomatePortal - Internal Edition"""\n'
         'import os, sys\n'
         'os.environ["AUTOMATEPORTAL_EDITION"] = "employer"\n'
-        'sys.path.insert(0, os.path.join(os.path.dirname(__file__), "lib"))\n'
+        'sys.path.insert(0, os.path.dirname(__file__))\n'
         'from run import main\n'
         'main()\n'
     )
@@ -129,8 +116,8 @@ def package(output_dir: Path):
     archive = shutil.make_archive(str(build_dir), "zip", output_dir, build_dir.name)
     print(f"\nPackage ready: {archive}")
     print(f"Directory:     {build_dir}")
-    print(f"\nIMPORTANT: This package contains ONLY compiled bytecode.")
-    print(f"           Source code is NOT included.")
+    print(f"\nThis package includes Python source code.")
+    print(f"The employer can modify it per their needs under LICENSE-EMPLOYER.")
 
 
 def main():
