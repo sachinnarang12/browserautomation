@@ -1,74 +1,21 @@
-AutomatePortal – Employer Limited-Use License (Version A)
-==========================================================
+MIT License
 
-Copyright (c) 2025-2026 Sachin Narang ("Licensor"). All rights reserved.
+Copyright (c) 2025-2026 Sachin Narang
 
-This license governs the use of the AutomatePortal Employer Edition
-("Software") provided to the Licensee's organization ("Licensee").
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-1. BACKGROUND & OWNERSHIP
-   The Software is the sole intellectual property of the Licensor. It was
-   created entirely by the Licensor on personal time, using personal
-   resources, outside of any employment duties. The Licensee acknowledges
-   and agrees that this Software is NOT a work-for-hire and is NOT owned by
-   the Licensee's organization.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-2. GRANT OF LICENSE
-   The Licensor grants the Licensee a:
-     - Non-exclusive
-     - Non-transferable
-     - Non-sublicensable
-     - Revocable
-   license to use and modify the Software solely for the Licensee's
-   internal business operations.
-
-3. PERMITTED MODIFICATIONS
-   The Licensee MAY modify the Software to adapt it for their internal
-   business operations. All modifications remain subject to this license
-   and do not transfer any ownership rights to the Licensee.
-
-4. RESTRICTIONS
-   The Licensee SHALL NOT:
-     a) Redistribute, sublicense, rent, lease, or transfer the Software
-        (or any modified version) to any third party;
-     b) Use the Software or its source code to develop competing products
-        or services;
-     c) Remove or alter any copyright notices, branding, or proprietary
-        markings;
-     d) Claim ownership, authorship, or intellectual property rights over
-        any portion of the Software (including modifications);
-     e) Publish, share, or make the source code available outside the
-        Licensee's organization.
-
-5. SUPPORT & UPDATES
-   The Licensor may, at their sole discretion, provide updates, bug fixes,
-   or support. No obligation to do so is created by this license.
-
-6. NO WARRANTY
-   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS
-   OR IMPLIED. THE LICENSOR MAKES NO GUARANTEES REGARDING FITNESS FOR A
-   PARTICULAR PURPOSE, ACCURACY, OR RELIABILITY.
-
-7. LIMITATION OF LIABILITY
-   IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
-   SPECIAL, OR CONSEQUENTIAL DAMAGES ARISING FROM THE USE OF THE SOFTWARE.
-
-8. TERM & TERMINATION
-   This license is effective until terminated. Either party may terminate
-   with 30 days written notice. Upon termination, the Licensee must
-   destroy all copies of the Software (including source code and any
-   modifications) in their possession.
-
-9. ACKNOWLEDGEMENT
-   By using the Software, the Licensee acknowledges that:
-     - The Software is the personal intellectual property of the Licensor;
-     - No employment relationship creates any claim to this Software;
-     - This license does not constitute a transfer of ownership;
-     - Modifications made by the Licensee do not create ownership claims.
-
-10. GOVERNING LAW
-   This license is governed by the laws of the state of New Jersey,
-   United States of America.
-
-Licensor: Sachin Narang
-Contact:  support@automateportal.com
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
