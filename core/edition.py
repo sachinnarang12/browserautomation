@@ -3,8 +3,8 @@ Edition Configuration
 ---------------------
 Controls which features are available in each product edition.
 
-Version A  (employer)   — same features as today, minus licensing/billing
-Version B  (commercial) — full product with licensing + future SaaS features
+Standard    — core features, no licensing/billing
+Commercial  — full product with licensing + future SaaS features
 
 NOTE: Feature flags marked "future" are NOT yet implemented.  They exist as
 placeholders so that when you build them, they are automatically gated to
@@ -18,8 +18,8 @@ from typing import Dict
 
 
 class Edition(Enum):
-    EMPLOYER = "employer"       # Version A – provided to employer
-    COMMERCIAL = "commercial"   # Version B – sold on the market
+    STANDARD = "standard"       # Core feature set
+    COMMERCIAL = "commercial"   # Full product
 
 
 @dataclass(frozen=True)
@@ -63,8 +63,8 @@ class EditionConfig:
 
 EDITIONS: Dict[Edition, EditionConfig] = {
 
-    Edition.EMPLOYER: EditionConfig(
-        edition=Edition.EMPLOYER,
+    Edition.STANDARD: EditionConfig(
+        edition=Edition.STANDARD,
         product_name="AutomatePortal – Internal",
         product_tagline="Internal browser automation tool",
 
@@ -97,7 +97,6 @@ EDITIONS: Dict[Edition, EditionConfig] = {
 
         licensing_enabled=True,
 
-        # Same as employer for now
         user_management=True,
         api_access=True,
 

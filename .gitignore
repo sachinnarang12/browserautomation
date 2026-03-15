@@ -66,10 +66,10 @@ desktop.ini
 /*.html
 !templates/
 
-# Packaged employer editions (bytecode builds)
+# Packaged editions
 dist/
-AutomatePortal-Employer/
-AutomatePortal-Employer.zip
+AutomatePortal-Standard/
+AutomatePortal-Standard.zip
 
 # License secret
 data/.license_secret

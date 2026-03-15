@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Package the Employer Edition (Version A) for delivery.
+Package the Standard Edition for delivery.
 
 This script creates a distributable archive that includes:
-  - Python source files (.py) so the employer can refine per their needs
+  - Python source files (.py) for customisation
   - Templates and static assets
-  - The employer license
+  - The MIT license
   - A pre-configured launcher
 
 Usage:
-    python editions/employer/package_employer_edition.py [--output-dir ./dist]
+    python editions/standard/package_edition.py [--output-dir ./dist]
 """
 
 import argparse
@@ -37,21 +37,20 @@ INCLUDE_DIRS = [
 
 INCLUDE_FILES = [
     "requirements.txt",
-    "LICENSE-EMPLOYER",
-    "editions/employer/run.py",
-    "editions/employer/config.py",
+    "LICENSE",
+    "editions/standard/run.py",
+    "editions/standard/config.py",
 ]
 
-# Files that must NEVER be in the employer package
+# Files that must NEVER be in the standard package
 NEVER_INCLUDE = {
-    "LICENSE",               # full proprietary license (your eyes only)
     "COPYRIGHT_HEADER.py",
     "PRODUCT_ROADMAP_V2.md",
     "DUAL_VERSION_STRATEGY.md",
     "doc/saas-product-guide.html",
     "doc/technical-design.html",
     "editions/commercial",
-    "license_manager.py",    # commercial-only licensing system
+    "license_manager.py",
     ".env",
     ".env.example",
     "agent_config.json",
@@ -62,14 +61,14 @@ NEVER_INCLUDE = {
 
 
 def package(output_dir: Path):
-    build_dir = output_dir / "AutomatePortal-Employer"
+    build_dir = output_dir / "AutomatePortal-Standard"
 
     # Clean previous build
     if build_dir.exists():
         shutil.rmtree(build_dir)
     build_dir.mkdir(parents=True)
 
-    print(f"Packaging Employer Edition to: {build_dir}")
+    print(f"Packaging Standard Edition to: {build_dir}")
 
     # 1. Copy core Python source files
     for mod_path in CORE_MODULES:
@@ -105,7 +104,7 @@ def package(output_dir: Path):
         '#!/usr/bin/env python3\n'
         '"""AutomatePortal - Internal Edition"""\n'
         'import os, sys\n'
-        'os.environ["AUTOMATEPORTAL_EDITION"] = "employer"\n'
+        'os.environ["AUTOMATEPORTAL_EDITION"] = "standard"\n'
         'sys.path.insert(0, os.path.dirname(__file__))\n'
         'from run import main\n'
         'main()\n'
@@ -117,11 +116,11 @@ def package(output_dir: Path):
     print(f"\nPackage ready: {archive}")
     print(f"Directory:     {build_dir}")
     print(f"\nThis package includes Python source code.")
-    print(f"The employer can modify it per their needs under LICENSE-EMPLOYER.")
+    print(f"Modify as needed per the MIT license.")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Package AutomatePortal Employer Edition")
+    parser = argparse.ArgumentParser(description="Package AutomatePortal Standard Edition")
     parser.add_argument("--output-dir", default="./dist", help="Output directory")
     args = parser.parse_args()
 

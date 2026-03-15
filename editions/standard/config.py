@@ -1,5 +1,5 @@
 """
-Employer edition defaults.
+Standard edition defaults.
 Stripped-down branding and no commercial features.
 """
 
