@@ -11,6 +11,7 @@ services:
       - .env                          # Create from .env.example
     environment:
       - FLASK_ENV=production
+      - AUTOMATEPORTAL_EDITION=${AUTOMATEPORTAL_EDITION:-standard}
     volumes:
       # Persist data across container restarts (secrets, DB, config)
       - portal-data:/app/data
