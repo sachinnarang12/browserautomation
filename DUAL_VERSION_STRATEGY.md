@@ -10,7 +10,8 @@ on personal time using personal resources.  Two editions exist:
 | Purpose          | Help employer's operations           | SaaS product sold on the market          |
 | License          | `LICENSE-EMPLOYER` (limited-use)     | `LICENSE` (proprietary / commercial)     |
 | Source code      | **Never shared** (bytecode only)     | Full source (your private repo)          |
-| Features         | Basic automation, single-tenant      | Full: licensing, multi-tenant, API, etc. |
+| Features today   | Everything EXCEPT licensing/billing  | Everything including licensing/billing   |
+| Future features  | Frozen at what exists today          | Gets all new features (multi-tenant, marketplace, etc.) |
 | Branding         | "AutomatePortal – Internal"          | "AutomatePortal"                         |
 | Updates          | At your discretion                   | Continuous, paid tiers                   |
 

@@ -3,12 +3,16 @@ Edition Configuration
 ---------------------
 Controls which features are available in each product edition.
 
-Version A  (employer)   — limited, single-tenant, no licensing/billing
-Version B  (commercial) — full SaaS product with licensing, multi-tenant, branding
+Version A  (employer)   — same features as today, minus licensing/billing
+Version B  (commercial) — full product with licensing + future SaaS features
+
+NOTE: Feature flags marked "future" are NOT yet implemented.  They exist as
+placeholders so that when you build them, they are automatically gated to
+the commercial edition.  Only `licensing_enabled` is actively enforced today.
 """
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict
 
@@ -26,23 +30,27 @@ class EditionConfig:
     product_name: str
     product_tagline: str
 
-    # Feature gates
-    licensing_enabled: bool = False
+    # ── Currently enforced ──────────────────────────────────────────
+    licensing_enabled: bool = False       # license key system & tier limits
+
+    # ── Currently implemented, same in both editions ────────────────
+    user_management: bool = True          # /users page (exists today)
+    api_access: bool = True               # /api/* endpoints (exist today)
+
+    # ── Future – not yet built (gate when you implement them) ───────
     multi_tenant: bool = False
-    user_management: bool = False
-    api_access: bool = False
     custom_branding: bool = False
     template_marketplace: bool = False
-    advanced_scheduling: bool = False
+    advanced_scheduling: bool = False     # cron-style (today is daily only)
     notifications_enabled: bool = False
     export_import: bool = False
     cloud_deployment: bool = False
     audit_logging: bool = False
 
-    # Hard limits
-    max_tasks: int = 5
-    max_credentials: int = 3
-    max_users: int = 1
+    # Hard limits (only meaningful when licensing_enabled=True)
+    max_tasks: int = 999999
+    max_credentials: int = 999999
+    max_users: int = 25
 
     # Branding
     primary_color: str = "#2563eb"
@@ -60,21 +68,22 @@ EDITIONS: Dict[Edition, EditionConfig] = {
         product_name="AutomatePortal – Internal",
         product_tagline="Internal browser automation tool",
 
-        licensing_enabled=False,     # no license keys needed
+        # Only real difference today: no licensing system
+        licensing_enabled=False,
+
+        # Everything that exists today stays enabled
+        user_management=True,
+        api_access=True,
+
+        # Future features — will be commercial-only when built
         multi_tenant=False,
-        user_management=False,       # single shared login
-        api_access=False,
         custom_branding=False,
         template_marketplace=False,
-        advanced_scheduling=False,   # basic daily schedule only
+        advanced_scheduling=False,
         notifications_enabled=False,
         export_import=False,
         cloud_deployment=False,
         audit_logging=False,
-
-        max_tasks=10,
-        max_credentials=5,
-        max_users=1,
 
         primary_color="#2563eb",
         support_email="",
@@ -87,9 +96,13 @@ EDITIONS: Dict[Edition, EditionConfig] = {
         product_tagline="Automate any web portal – no code required",
 
         licensing_enabled=True,
-        multi_tenant=True,
+
+        # Same as employer for now
         user_management=True,
         api_access=True,
+
+        # Future features — commercial gets them when built
+        multi_tenant=True,
         custom_branding=True,
         template_marketplace=True,
         advanced_scheduling=True,
