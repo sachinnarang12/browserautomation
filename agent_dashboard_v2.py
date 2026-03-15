@@ -17,6 +17,7 @@ from auth_manager import AuthManager, User
 from credential_manager import CredentialManager
 from database import Database, Task as DBTask, Credential as DBCredential, Execution, TaskStatus
 from license_manager import get_current_license, activate_license, validate_license_key, check_limit, TIER_LIMITS
+from core.edition import get_config as get_edition_config, Edition
 
 app = Flask(__name__)
 
@@ -76,8 +77,14 @@ def is_setup_complete():
 
 @app.context_processor
 def inject_license():
-    """Make license info available in all templates"""
-    return {'license_info': get_current_license()}
+    """Make license info and edition config available in all templates"""
+    edition_cfg = get_edition_config()
+    return {
+        'license_info': get_current_license(),
+        'edition': edition_cfg,
+        'product_name': edition_cfg.product_name,
+        'product_tagline': edition_cfg.product_tagline,
+    }
 
 @app.route('/setup', methods=['GET', 'POST'])
 def setup_wizard():
@@ -150,7 +157,10 @@ def _default_download_dir():
 @app.route('/license', methods=['GET', 'POST'])
 @login_required
 def license_page():
-    """License activation page"""
+    """License activation page (commercial edition only)"""
+    if not get_edition_config().licensing_enabled:
+        flash('Licensing is not available in this edition.', 'error')
+        return redirect(url_for('dashboard'))
     if not current_user.is_admin:
         flash('Access denied. Admin privileges required.', 'error')
         return redirect(url_for('dashboard'))

@@ -66,6 +66,14 @@ desktop.ini
 /*.html
 !templates/
 
+# Packaged employer editions (bytecode builds)
+dist/
+AutomatePortal-Employer/
+AutomatePortal-Employer.zip
+
+# License secret
+data/.license_secret
+
 # Kiro specific
 .kiro/
 
