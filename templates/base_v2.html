@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AutomatePortal{% endblock %}</title>
+    <title>{% block title %}{{ product_name }}{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <style>
@@ -103,12 +103,12 @@
     <div class="min-h-full">
         {% if user and user.is_authenticated %}
         <!-- Navigation -->
-        <nav class="bg-indigo-600">
+        <nav style="background-color: {{ edition.primary_color }}">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <span class="text-white text-xl font-bold">AutomatePortal</span>
+                            <span class="text-white text-xl font-bold">{{ product_name }}</span>
                         </div>
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
@@ -137,10 +137,12 @@
                                    class="{% if request.endpoint == 'users' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
                                     Users
                                 </a>
+                                {% if edition.licensing_enabled %}
                                 <a href="{{ url_for('license_page') }}"
                                    class="{% if request.endpoint == 'license_page' %}bg-indigo-700 text-white{% else %}text-indigo-200 hover:bg-indigo-500 hover:text-white{% endif %} rounded-md px-3 py-2 text-sm font-medium">
                                     License
                                 </a>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -177,7 +179,9 @@
                     <a href="{{ url_for('live_monitor') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Live Monitor</a>
                     {% if user.is_admin %}
                     <a href="{{ url_for('users') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Users</a>
+                    {% if edition.licensing_enabled %}
                     <a href="{{ url_for('license_page') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">License</a>
+                    {% endif %}
                     {% endif %}
                     <a href="{{ url_for('profile') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Profile</a>
                     <a href="{{ url_for('logout') }}" class="text-indigo-200 hover:bg-indigo-500 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Logout</a>
@@ -229,7 +233,7 @@
         {% if user and user.is_authenticated %}
         <footer class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 mt-8">
             <div class="border-t border-gray-200 pt-4">
-                <p class="text-center text-xs text-gray-400">AutomatePortal v2.0 &bull; {{ license_info.limits.label if license_info and license_info.limits else '' }}</p>
+                <p class="text-center text-xs text-gray-400">{{ product_name }} v2.0{% if edition.licensing_enabled and license_info and license_info.limits %} &bull; {{ license_info.limits.label }}{% endif %}</p>
             </div>
         </footer>
         {% endif %}

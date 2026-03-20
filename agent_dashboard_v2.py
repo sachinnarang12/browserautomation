@@ -60,6 +60,9 @@ auth_manager = AuthManager()
 credential_manager = CredentialManager()
 db = Database()
 
+# Ensure data directory exists on first run (Docker volume may be empty)
+Path('data').mkdir(parents=True, exist_ok=True)
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load user for Flask-Login"""
@@ -702,6 +705,12 @@ def _run_task_inner(task_id):
             except Exception:
                 pass
 
+    # Mark task as running BEFORE starting the thread (prevents UI race condition)
+    task['status'] = 'running'
+    task['last_run'] = datetime.now().isoformat()
+    with open(config_file, 'w') as f:
+        json.dump(data, f, indent=2)
+
     thread = threading.Thread(target=run_in_background, args=(task_id,), daemon=True)
     thread.start()
 
@@ -825,6 +834,11 @@ def not_found(error):
                          error_code=404,
                          error_message='Page not found',
                          user=current_user if current_user.is_authenticated else None), 404
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Docker / load balancers (no auth required)"""
+    return jsonify({'status': 'healthy', 'edition': get_edition_config().edition.value}), 200
 
 @app.errorhandler(500)
 def internal_error(error):

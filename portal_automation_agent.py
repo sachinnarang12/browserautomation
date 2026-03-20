@@ -405,6 +405,18 @@ class PortalAutomationAgent:
         except Exception as e:
             logger.error(f"Task {task.name} failed: {self._mask_secrets(str(e))}")
 
+            # Capture screenshot for debugging
+            if nova is not None:
+                try:
+                    screenshot_dir = Path('data/screenshots')
+                    screenshot_dir.mkdir(parents=True, exist_ok=True)
+                    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    screenshot_path = screenshot_dir / f"{task_id}_{ts}.png"
+                    nova.page.screenshot(path=str(screenshot_path))
+                    logger.info(f"Failure screenshot saved: {screenshot_path}")
+                except Exception as ss_err:
+                    logger.warning(f"Could not capture failure screenshot: {ss_err}")
+
             # Update task with failure
             task.status = TaskStatus.FAILED
             task.error_message = self._mask_secrets(str(e))

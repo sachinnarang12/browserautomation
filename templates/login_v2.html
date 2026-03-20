@@ -1,6 +1,6 @@
 {% extends "base_v2.html" %}
 
-{% block title %}Login - AutomatePortal{% endblock %}
+{% block title %}Login - {{ product_name }}{% endblock %}
 
 {% block content %}
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -11,9 +11,9 @@
             </svg>
         </div>
         <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            AutomatePortal
+            {{ product_name }}
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">AI-Powered Browser Automation</p>
+        <p class="mt-2 text-center text-sm text-gray-600">{{ product_tagline }}</p>
         <p class="mt-1 text-center text-xs text-gray-400">Sign in to your account</p>
     </div>
 

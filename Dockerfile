@@ -5,7 +5,8 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
-    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers \
+    TZ=America/New_York
 
 WORKDIR /app
 
@@ -54,6 +55,10 @@ RUN groupadd -r portal && useradd -r -g portal -d /app -s /bin/bash portal && \
 
 # Expose ports: 5000=webapp, 6080=noVNC
 EXPOSE 5000 6080
+
+# Health check for Docker
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
 
 # Install gunicorn at build time
 RUN pip install --no-cache-dir gunicorn
