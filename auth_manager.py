@@ -7,6 +7,7 @@ Handles user authentication and session management for the web dashboard
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import fcntl
 import json
 from pathlib import Path
 import secrets
@@ -77,19 +78,40 @@ class AuthManager:
         The setup wizard (first-run) forces the user to choose a real password
         before they can log in, so this temporary password is never usable in
         practice.
+
+        Uses a file lock to prevent multiple gunicorn workers from racing.
         """
-        temp_password = secrets.token_urlsafe(24)
-        admin_id = secrets.token_hex(8)
-        admin = User(
-            id=admin_id,
-            username='admin',
-            password_hash=generate_password_hash(temp_password),
-            email='admin@localhost',
-            is_admin=True
-        )
-        self.users[admin_id] = admin
-        self._save_users()
-        print("Default admin user created — password must be set via setup wizard.")
+        lock_path = self.users_file.with_suffix('.lock')
+        with open(lock_path, 'w') as lock_fd:
+            fcntl.flock(lock_fd, fcntl.LOCK_EX)
+            # Re-check after acquiring lock — another worker may have created it
+            if self.users_file.exists():
+                self._load_users_from_file()
+                if self.users:
+                    return
+            temp_password = secrets.token_urlsafe(24)
+            admin_id = secrets.token_hex(8)
+            admin = User(
+                id=admin_id,
+                username='admin',
+                password_hash=generate_password_hash(temp_password),
+                email='admin@localhost',
+                is_admin=True
+            )
+            self.users[admin_id] = admin
+            self._save_users()
+            print("Default admin user created — password must be set via setup wizard.")
+
+    def _load_users_from_file(self):
+        """Load users from file without triggering default admin creation."""
+        try:
+            with open(self.users_file, 'r') as f:
+                data = json.load(f)
+                for user_data in data.get('users', []):
+                    user = User(**user_data)
+                    self.users[user.id] = user
+        except Exception as e:
+            print(f"Error loading users: {e}")
     
     def create_user(self, username, password, email=None, is_admin=False):
         """Create a new user"""
