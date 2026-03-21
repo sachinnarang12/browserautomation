@@ -45,6 +45,10 @@ def _get_flask_secret():
     return key
 
 app.secret_key = _get_flask_secret()
+# Keep sessions alive for 7 days so users don't get logged out quickly
+app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24 * 7  # 7 days
+app.config['REMEMBER_COOKIE_DURATION'] = 60 * 60 * 24 * 30   # 30 days
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # Ensure error handlers work even in debug mode (otherwise Flask
 # propagates exceptions to Werkzeug's HTML debugger, breaking JSON APIs)
 app.config['PROPAGATE_EXCEPTIONS'] = False
@@ -199,11 +203,12 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        remember = request.form.get('remember', False)
-        
+        remember = bool(request.form.get('remember'))
+
         user = auth_manager.authenticate(username, password)
-        
+
         if user:
+            session.permanent = True
             login_user(user, remember=remember)
             
             # Update last login
