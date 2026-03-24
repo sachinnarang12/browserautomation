@@ -82,6 +82,9 @@ class PortalAutomationAgent:
             "nova_act_api_key": nova_api_key or ""
         }
 
+        # Persistent browser profile to avoid CAPTCHA on repeat visits
+        self.user_data_dir = ""
+
         # Download directory configuration (defaults to user's Downloads folder)
         self.download_dir = ""
 
@@ -121,6 +124,10 @@ class PortalAutomationAgent:
                 if 'download_dir' in data:
                     self.download_dir = data['download_dir']
 
+                # Load persistent browser profile directory
+                if 'user_data_dir' in data:
+                    self.user_data_dir = data['user_data_dir']
+
                 logger.info(f"Loaded {len(self.tasks)} tasks from config")
             except Exception as e:
                 logger.error(f"Error loading config: {e}")
@@ -146,6 +153,7 @@ class PortalAutomationAgent:
                 'tasks': tasks_data,
                 'nova_config': safe_nova_config,
                 'download_dir': self.download_dir,
+                'user_data_dir': self.user_data_dir,
                 'last_updated': datetime.now().isoformat()
             }
             
@@ -332,10 +340,15 @@ class PortalAutomationAgent:
             self._cleanup_stale_sessions(task_id)
 
             # Create Nova Act session
-            nova = NovaAct(
-                starting_page=task.url,
-                **self.nova_config
-            )
+            # Use persistent browser profile if configured (avoids CAPTCHA)
+            nova_kwargs = dict(starting_page=task.url, **self.nova_config)
+            if self.user_data_dir:
+                profile_path = Path(self.user_data_dir)
+                profile_path.mkdir(parents=True, exist_ok=True)
+                nova_kwargs["user_data_dir"] = str(profile_path)
+                nova_kwargs["clone_user_data_dir"] = False
+                logger.info(f"Using persistent browser profile: {profile_path}")
+            nova = NovaAct(**nova_kwargs)
 
             self.nova_sessions[task_id] = nova
             nova.start()
@@ -575,11 +588,36 @@ def main():
     parser.add_argument("--start", action="store_true", help="Start the scheduler")
     parser.add_argument("--status", action="store_true", help="Show status report")
     parser.add_argument("--list", action="store_true", help="List all tasks")
+    parser.add_argument("--setup-profile", type=str, metavar="URL",
+                        help="Open a browser for manual login to create a persistent profile. "
+                             "Log in, solve CAPTCHA, then close the browser to save the session.")
     
     args = parser.parse_args()
     
     agent = PortalAutomationAgent(args.config)
-    
+
+    if args.setup_profile:
+        profile_dir = Path(agent.config_file).parent / "browser_profile"
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Opening browser with persistent profile at: {profile_dir}")
+        print("Log in manually, solve any CAPTCHA, then close the browser window.")
+        print("The session cookies will be saved for future automated runs.")
+        nova = NovaAct(
+            starting_page=args.setup_profile,
+            headless=False,
+            user_data_dir=str(profile_dir),
+            clone_user_data_dir=False,
+            nova_act_api_key=agent.nova_config.get("nova_act_api_key", ""),
+        )
+        nova.start()
+        input("Press Enter here AFTER you have logged in and are done...")
+        nova.stop()
+        # Save profile path to config
+        agent.user_data_dir = str(profile_dir)
+        agent.save_config()
+        print(f"Profile saved. Future runs will reuse cookies from: {profile_dir}")
+        return
+
     if args.status:
         report = agent.get_status_report()
         print(json.dumps(report, indent=2))
