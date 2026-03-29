@@ -155,6 +155,11 @@ def setup_wizard():
 
 def _default_download_dir():
     """Get a sensible default download directory"""
+    # In Docker, use the mapped data volume so files are accessible from host
+    docker_downloads = Path('/app/data/downloads')
+    if docker_downloads.parent.exists():
+        docker_downloads.mkdir(parents=True, exist_ok=True)
+        return str(docker_downloads)
     home = Path.home()
     downloads = home / 'Downloads'
     return str(downloads) if downloads.exists() else str(home)
