@@ -40,6 +40,10 @@ INCLUDE_FILES = [
     "LICENSE",
     "editions/standard/run.py",
     "editions/standard/config.py",
+    "Dockerfile",
+    "docker-compose.yml",
+    "entrypoint.sh",
+    "test_persistent_profile.py",
 ]
 
 # Files that must NEVER be in the standard package
